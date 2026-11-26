@@ -259,7 +259,7 @@ export const Hero: React.FC<HeroProps> = ({
             </div>
 
             {/* Mode-Sensitive Direct Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 pt-2 w-full max-w-md sm:max-w-none">
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2 w-full max-w-2xl">
               {isDesign ? (
                 <>
                   {/* Design Mode Buttons */}
@@ -273,6 +273,23 @@ export const Hero: React.FC<HeroProps> = ({
                     <Sparkles className="w-4 h-4 text-purple-100 shrink-0 animate-pulse" />
                     <span>Commission Design</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0 text-purple-200" />
+                  </button>
+
+                  {/* Prominent Snap Flash Button with Poppers */}
+                  <button
+                    onClick={triggerShutterFlash}
+                    className="group relative inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 rounded-full font-nav font-bold text-xs sm:text-sm tracking-wide bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-black border border-amber-200 shadow-xl shadow-amber-500/30 hover:shadow-amber-400/50 hover:scale-[1.04] active:scale-[0.98] transition-all cursor-pointer select-none"
+                    title="Click to trigger camera shutter flash & celebratory poppers!"
+                  >
+                    <span className="relative flex h-2.5 w-2.5 shrink-0">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-black" />
+                    </span>
+                    <Zap className="w-4 h-4 text-black group-hover:scale-110 transition-transform filter drop-shadow-[0_0_4px_rgba(0,0,0,0.5)]" />
+                    <span>Snap Flash</span>
+                    <span className="text-[10px] font-mono font-extrabold px-1.5 py-0.5 rounded-md bg-black/20 text-black uppercase tracking-wider">
+                      Poppers! 📸
+                    </span>
                   </button>
 
                   <button
@@ -313,6 +330,23 @@ export const Hero: React.FC<HeroProps> = ({
                     <Sparkles className="w-4 h-4 text-purple-100 shrink-0 animate-pulse" />
                     <span>Book a Session</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0 text-purple-200" />
+                  </button>
+
+                  {/* Prominent Snap Flash Button with Poppers */}
+                  <button
+                    onClick={triggerShutterFlash}
+                    className="group relative inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 rounded-full font-nav font-bold text-xs sm:text-sm tracking-wide bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-black border border-amber-200 shadow-xl shadow-amber-500/30 hover:shadow-amber-400/50 hover:scale-[1.04] active:scale-[0.98] transition-all cursor-pointer select-none"
+                    title="Click to fire studio shutter flash & celebratory poppers!"
+                  >
+                    <span className="relative flex h-2.5 w-2.5 shrink-0">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-black" />
+                    </span>
+                    <Zap className="w-4 h-4 text-black group-hover:scale-110 transition-transform filter drop-shadow-[0_0_4px_rgba(0,0,0,0.5)]" />
+                    <span>Snap Flash</span>
+                    <span className="text-[10.5px] font-mono font-extrabold px-1.5 py-0.5 rounded-md bg-black/20 text-black uppercase tracking-wider">
+                      Poppers! 📸
+                    </span>
                   </button>
 
                   <button
@@ -402,7 +436,7 @@ export const Hero: React.FC<HeroProps> = ({
                 }`} />
 
                 <span className="font-semibold tracking-wide">
-                  {isDesign ? 'Trigger Vector Glow' : 'Snap 4K Flash'}
+                  Snap Flash
                 </span>
 
                 <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider ${
@@ -457,18 +491,13 @@ export const Hero: React.FC<HeroProps> = ({
               {/* Interactive Viewfinder Shutter HUD Badge on Portrait */}
               <button
                 onClick={triggerShutterFlash}
-                className={`absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-20 group inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/85 hover:bg-black text-white shadow-2xl backdrop-blur-md text-[10.5px] sm:text-xs font-mono tracking-wider transition-all hover:scale-105 active:scale-95 cursor-pointer border ${
-                  isDesign
-                    ? 'border-purple-400/60 hover:border-fuchsia-300 shadow-purple-500/30'
-                    : 'border-amber-400/60 hover:border-amber-300 shadow-amber-500/30'
-                }`}
-                title={isDesign ? "Click to trigger creative vector glow & poppers" : "Click to fire studio shutter flash & poppers"}
+                className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-20 group inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-black/90 hover:bg-black text-white shadow-2xl backdrop-blur-md text-[11px] sm:text-xs font-mono tracking-wider transition-all hover:scale-105 active:scale-95 cursor-pointer border border-amber-400/70 hover:border-amber-300 shadow-amber-500/30"
+                title="Click to fire studio shutter flash & poppers"
               >
-                <span className={`w-2 h-2 rounded-full animate-pulse shadow-sm ${
-                  isDesign ? 'bg-fuchsia-400 shadow-fuchsia-400' : 'bg-amber-400 shadow-amber-400'
-                }`} />
-                <span className={`font-bold ${isDesign ? 'text-purple-200 group-hover:text-white' : 'text-amber-200 group-hover:text-amber-100'}`}>
-                  {isDesign ? '✦ CLICK TO GLOW' : '📸 CLICK TO SNAP'}
+                <span className="w-2.5 h-2.5 rounded-full animate-ping bg-amber-400 opacity-75" />
+                <span className="font-bold text-amber-200 group-hover:text-amber-100 flex items-center gap-1.5">
+                  <Camera className="w-3.5 h-3.5 text-amber-300" />
+                  <span>SNAP FLASH 📸</span>
                 </span>
               </button>
             </motion.div>
