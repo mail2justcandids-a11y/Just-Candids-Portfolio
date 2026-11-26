@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Sparkles, PenTool, Layers, Compass, Zap, Move } from 'lucide-react';
 import { soundEngine } from '../utils/soundEngine';
 
@@ -12,7 +12,31 @@ export const SpatialHologram: React.FC<SpatialHologramProps> = ({ isTriggered, o
   const [isActive, setIsActive] = useState<boolean>(false);
   const [spiralSpeed, setSpiralSpeed] = useState<number>(20);
   const [activeGlyph, setActiveGlyph] = useState<'Aa' | '✦' | '&' | '1.618'>('Aa');
-  const [speech, setSpeech] = useState<string>('Spatial 3D Canvas Active');
+  const stageRef = useRef<HTMLDivElement>(null);
+
+  // Smooth interactive mouse physics for Apple Pencil tracking
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const smoothMouseX = useSpring(mouseX, { stiffness: 120, damping: 18 });
+  const smoothMouseY = useSpring(mouseY, { stiffness: 120, damping: 18 });
+
+  // Dynamic tilt & parallax response
+  const pencilTiltX = useTransform(smoothMouseY, [-100, 100], [15, -15]);
+  const pencilTiltY = useTransform(smoothMouseX, [-100, 100], [-20, 20]);
+
+  const handleStageMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!stageRef.current) return;
+    const rect = stageRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    mouseX.set(x * 0.45);
+    mouseY.set(y * 0.45);
+  };
+
+  const handleStageMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
 
   useEffect(() => {
     if (isTriggered) {
@@ -22,7 +46,7 @@ export const SpatialHologram: React.FC<SpatialHologramProps> = ({ isTriggered, o
 
   const triggerSpatialBurst = () => {
     setIsActive(true);
-    setSpiralSpeed(4);
+    setSpiralSpeed(3.5);
     soundEngine.playVectorPenSnap();
 
     setTimeout(() => {
@@ -47,9 +71,12 @@ export const SpatialHologram: React.FC<SpatialHologramProps> = ({ isTriggered, o
 
   return (
     <div
+      ref={stageRef}
+      onMouseMove={handleStageMouseMove}
+      onMouseLeave={handleStageMouseLeave}
       onClick={handlePencilClick}
       className="group relative cursor-pointer select-none flex flex-col items-center filter drop-shadow-[0_20px_45px_rgba(0,0,0,0.9)]"
-      title="Click the spatial hologram to trigger 3D vector illumination!"
+      title="Move your mouse to guide the levitating Apple Pencil, or click to sketch!"
     >
       {/* 1. Spatial Telemetry Bubble (Normal layout flow - zero overlap) */}
       <motion.div
@@ -60,7 +87,7 @@ export const SpatialHologram: React.FC<SpatialHologramProps> = ({ isTriggered, o
         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#090b16]/95 border border-cyan-500/50 shadow-xl backdrop-blur-xl text-[10px] sm:text-[11px] font-mono text-cyan-200">
           <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_#22d3ee] animate-ping shrink-0" />
           <span className="font-semibold text-white tracking-tight">
-            {isActive ? '✦ 3D VECTOR BEAM LOCKED' : 'Spatial Studio // φ = 1.618'}
+            {isActive ? '✦ 3D VECTOR BEAM LOCKED' : 'Hover to Guide • Click to Sketch'}
           </span>
         </div>
       </motion.div>
@@ -93,7 +120,6 @@ export const SpatialHologram: React.FC<SpatialHologramProps> = ({ isTriggered, o
                 <stop offset="100%" stopColor="#f43f5e" />
               </linearGradient>
             </defs>
-            {/* Golden Ratio Spiral Path */}
             <path
               d="M 100 100 A 10 10 0 0 1 110 100 A 20 20 0 0 1 90 100 A 40 40 0 0 1 130 100 A 70 70 0 0 1 60 100 A 110 110 0 0 1 170 100"
               stroke="url(#goldSpiral)"
@@ -102,58 +128,157 @@ export const SpatialHologram: React.FC<SpatialHologramProps> = ({ isTriggered, o
               fill="none"
               className={isActive ? 'filter drop-shadow-[0_0_12px_#38bdf8]' : ''}
             />
-            {/* Sacred Geometry Golden Rectangle Guides */}
             <rect x="30" y="30" width="140" height="86" stroke="#a855f7" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
             <rect x="30" y="30" width="86" height="86" stroke="#38bdf8" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
           </svg>
         </motion.div>
 
-        {/* Levitating Apple Pencil / Stylus (Tilted 45 Deg in Mid-Air) */}
+        {/* Dynamic Luminous Vector Ribbon Trail following the moving pencil */}
+        <svg
+          viewBox="0 0 260 260"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="absolute inset-0 w-full h-full pointer-events-none z-20"
+        >
+          <defs>
+            <linearGradient id="pencilTrailGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.8" />
+              <stop offset="50%" stopColor="#c084fc" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="#ec4899" stopOpacity="0.4" />
+            </linearGradient>
+            <filter id="pencilGlow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3.5" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+          {/* Animated SVG drawing trail that dances with the pencil */}
+          <motion.path
+            d="M 60 160 C 90 80, 180 60, 200 130 C 220 200, 120 210, 80 170 C 50 140, 130 90, 180 120"
+            stroke="url(#pencilTrailGrad)"
+            strokeWidth="3"
+            strokeLinecap="round"
+            fill="none"
+            filter="url(#pencilGlow)"
+            animate={{
+              pathLength: [0.1, 1, 0.4, 0.9],
+              pathOffset: [0, 0.5, 1, 0],
+              opacity: [0.6, 0.95, 0.7, 0.9],
+            }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          />
+        </svg>
+
+        {/* LEVITATING, DYNAMICALLY MOVING APPLE PENCIL / STYLUS */}
         <motion.div
-          animate={
-            isActive
-              ? { x: [0, 20, -15, 0], y: [-15, 10, -20, -15], rotate: [45, 55, 38, 45] }
-              : { y: [0, -8, 0], rotate: [45, 43, 45] }
-          }
-          transition={
-            isActive
-              ? { duration: 1.2, ease: 'easeInOut' }
-              : { duration: 3.5, repeat: Infinity, ease: 'easeInOut' }
-          }
+          style={{
+            x: smoothMouseX,
+            y: smoothMouseY,
+            rotateX: pencilTiltX,
+            rotateY: pencilTiltY,
+          }}
           className="absolute z-30 pointer-events-none"
         >
-          {/* Apple Pencil Body SVG */}
-          <svg width="180" height="40" viewBox="0 0 180 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="pencilBody" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#ffffff" />
-                <stop offset="50%" stopColor="#f1f5f9" />
-                <stop offset="100%" stopColor="#cbd5e1" />
-              </linearGradient>
-              <linearGradient id="nibLaser" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#38bdf8" />
-                <stop offset="100%" stopColor="#a855f7" />
-              </linearGradient>
-            </defs>
+          {/* Autonomous Flight / Sketching Animation loop */}
+          <motion.div
+            animate={
+              isActive
+                ? {
+                    x: [0, 45, -35, 20, 0],
+                    y: [0, -40, 25, -20, 0],
+                    rotate: [45, 405, 42, 48, 45],
+                    scale: [1, 1.2, 0.95, 1.1, 1],
+                  }
+                : {
+                    x: [-28, 22, 35, -18, -28],
+                    y: [-18, 16, -24, 12, -18],
+                    rotate: [42, 54, 40, 48, 42],
+                    scale: [1, 1.05, 0.98, 1.04, 1],
+                  }
+            }
+            transition={
+              isActive
+                ? { duration: 1.4, ease: 'easeInOut' }
+                : { duration: 6, repeat: Infinity, ease: 'easeInOut' }
+            }
+            className="relative"
+          >
+            {/* Apple Pencil Body SVG */}
+            <svg width="200" height="50" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="applePencilMatte" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#ffffff" />
+                  <stop offset="45%" stopColor="#f8fafc" />
+                  <stop offset="85%" stopColor="#e2e8f0" />
+                  <stop offset="100%" stopColor="#cbd5e1" />
+                </linearGradient>
+                <linearGradient id="energyRing" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#38bdf8" />
+                  <stop offset="100%" stopColor="#c084fc" />
+                </linearGradient>
+              </defs>
 
-            {/* Pencil Shaft with Flat Magnetic Side */}
-            <rect x="25" y="14" width="130" height="12" rx="6" fill="url(#pencilBody)" stroke="#94a3b8" strokeWidth="1" />
-            {/* Top Cap */}
-            <rect x="150" y="14" width="10" height="12" rx="3" fill="#e2e8f0" stroke="#64748b" strokeWidth="1" />
-            {/* Apple Logo engraved */}
-            <text x="135" y="23" fill="#64748b" fontSize="8" fontFamily="sans-serif"></text>
+              {/* Seamless Pencil Shaft with Flat Magnetic Snap Edge */}
+              <rect
+                x="30"
+                y="18"
+                width="145"
+                height="14"
+                rx="7"
+                fill="url(#applePencilMatte)"
+                stroke="#94a3b8"
+                strokeWidth="1.2"
+                filter="drop-shadow(0 10px 18px rgba(0,0,0,0.65))"
+              />
 
-            {/* Front Conical Tip */}
-            <polygon points="25,14 25,26 8,20" fill="#f8fafc" stroke="#94a3b8" strokeWidth="1" />
-            {/* Precision Ceramic Nib Tip */}
-            <circle cx="8" cy="20" r="2.5" fill="#38bdf8" />
-            {/* Laser Spark Flare */}
-            <circle cx="8" cy="20" r="6" fill="#38bdf8" opacity="0.6" className="animate-ping" />
+              {/* Metallic Top Cap with Polished Bevel */}
+              <rect x="170" y="18" width="12" height="14" rx="3.5" fill="#e2e8f0" stroke="#64748b" strokeWidth="1" />
+              <line x1="170" y1="18" x2="170" y2="32" stroke="#94a3b8" strokeWidth="1" />
 
-            {/* Floating Magnetic Energy Rings Around Pencil */}
-            <ellipse cx="60" cy="20" rx="4" ry="12" stroke="#38bdf8" strokeWidth="1.5" opacity="0.8" />
-            <ellipse cx="110" cy="20" rx="4" ry="12" stroke="#a855f7" strokeWidth="1.5" opacity="0.8" />
-          </svg>
+              {/* Laser Engraved Apple Logo */}
+              <text x="150" y="28" fill="#64748b" fontSize="9" fontFamily="sans-serif" fontWeight="bold">
+                
+              </text>
+
+              {/* Front Conical Taper Tip */}
+              <polygon points="30,18 30,32 10,25" fill="#f8fafc" stroke="#94a3b8" strokeWidth="1" />
+
+              {/* Precision Replaceable Fine Nib */}
+              <circle cx="10" cy="25" r="3" fill="#38bdf8" />
+
+              {/* Glowing High-Intensity Laser Tip Flare */}
+              <motion.circle
+                cx="10"
+                cy="25"
+                r="7"
+                fill="#38bdf8"
+                opacity="0.8"
+                animate={{ scale: [1, 1.8, 1], opacity: [0.8, 0.3, 0.8] }}
+                transition={{ duration: 1.2, repeat: Infinity }}
+              />
+              <circle cx="10" cy="25" r="2" fill="#ffffff" />
+
+              {/* Orbiting Magnetic Levitation Field Rings */}
+              <motion.g
+                animate={{ rotate: 360 }}
+                transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+                style={{ originX: '70px', originY: '25px' }}
+              >
+                <ellipse cx="70" cy="25" rx="5" ry="14" stroke="url(#energyRing)" strokeWidth="1.5" strokeDasharray="3 2" fill="none" opacity="0.9" />
+              </motion.g>
+
+              <motion.g
+                animate={{ rotate: -360 }}
+                transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
+                style={{ originX: '125px', originY: '25px' }}
+              >
+                <ellipse cx="125" cy="25" rx="5" ry="14" stroke="url(#energyRing)" strokeWidth="1.5" strokeDasharray="3 2" fill="none" opacity="0.9" />
+              </motion.g>
+            </svg>
+          </motion.div>
         </motion.div>
 
         {/* Refractive CMYK Glass Prism Token */}
