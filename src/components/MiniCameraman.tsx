@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Sparkles, Check, Crosshair } from 'lucide-react';
+import { Camera, Sparkles, Crosshair, Zap, Eye, RotateCcw } from 'lucide-react';
 import { soundEngine } from '../utils/soundEngine';
 
 interface MiniCameramanProps {
@@ -9,357 +9,468 @@ interface MiniCameramanProps {
 }
 
 export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSnap }) => {
-  const [isAiming, setIsAiming] = useState(false);
-  const [cameramanState, setCameramanState] = useState<'idle' | 'focusing' | 'snapping' | 'celebrating'>('idle');
-  const [speechText, setSpeechText] = useState<string>('Dialing 85mm ƒ/1.4...');
-  const [showPolaroid, setShowPolaroid] = useState(false);
+  const [animStage, setAnimStage] = useState<'idle' | 'dolly_in' | 'aiming' | 'flash' | 'eject' | 'celebrate'>('idle');
+  const [speech, setSpeech] = useState<string>('Dialing 85mm ƒ/1.4...');
+  const [polaroidDeveloped, setPolaroidDeveloped] = useState(false);
+  const [dollyPosition, setDollyPosition] = useState(0);
+  const [filmCount, setFilmCount] = useState(1);
 
-  // Periodic idle behavior: cameraman checks exposure, twists lens, looks through viewfinder
+  // Periodic idle chatter & camera tweaking
   useEffect(() => {
-    if (cameramanState === 'snapping' || cameramanState === 'celebrating') return;
+    if (animStage !== 'idle') return;
 
     const phrases = [
-      'Dialing 85mm ƒ/1.4...',
-      'Adjusting ISO 100...',
-      'Checking focal plane...',
-      'Setting shutter 1/500s...',
-      'Ready for the shot!',
+      'Setting 85mm ƒ/1.4...',
+      'ISO 100 locked in...',
+      'Checking light meter...',
+      'Framing the shot...',
+      'Standby on slider...',
     ];
 
     const interval = setInterval(() => {
-      setCameramanState((prev) => (prev === 'idle' ? 'focusing' : 'idle'));
-      const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-      setSpeechText(randomPhrase);
-    }, 4000);
+      const p = phrases[Math.floor(Math.random() * phrases.length)];
+      setSpeech(p);
+      setDollyPosition((prev) => (prev === 0 ? 10 : 0));
+    }, 4500);
 
     return () => clearInterval(interval);
-  }, [cameramanState]);
+  }, [animStage]);
 
-  // Handle external snap trigger (e.g. Snap Flash button clicked in Hero)
+  // Sync external snap trigger (e.g. Snap Flash button in Hero)
   useEffect(() => {
-    if (isTriggered) {
-      handleSnapAction();
+    if (isTriggered && animStage === 'idle') {
+      runFullCameramanSequence();
     }
   }, [isTriggered]);
 
-  const handleSnapAction = () => {
-    setCameramanState('snapping');
-    setSpeechText('Say Cheese! 📸');
-    setIsAiming(true);
+  const runFullCameramanSequence = () => {
+    // Stage 1: Dolly rush forward towards the subject
+    setAnimStage('dolly_in');
+    setSpeech('Rolling forward! 🎬');
+    soundEngine.playLensMotorWhir();
 
-    // After quick aim, trigger flash & pop polaroid
+    // Stage 2: Raise camera to eye, zoom lens, lock focus reticle
     setTimeout(() => {
-      setShowPolaroid(true);
-      setCameramanState('celebrating');
-      setSpeechText('Picture Perfect! ✨');
-    }, 450);
+      setAnimStage('aiming');
+      setSpeech('Hold that smile! 🎯');
+      soundEngine.playFocusBeep();
+    }, 400);
 
-    // Return to idle after celebration
+    // Stage 3: THE FLASH & SNAP
     setTimeout(() => {
-      setShowPolaroid(false);
-      setIsAiming(false);
-      setCameramanState('idle');
-      setSpeechText('Ready for next shot!');
-    }, 3600);
+      setAnimStage('flash');
+      setSpeech('SAY CHEESE! 📸');
+      soundEngine.playMechanicalShutter();
+    }, 950);
+
+    // Stage 4: Ejecting developing chemical Polaroid
+    setTimeout(() => {
+      setAnimStage('eject');
+      setSpeech('Developing print... ✨');
+      soundEngine.playPolaroidEject();
+      setPolaroidDeveloped(false);
+
+      // Chemical development reveal (fade from dark chemical mask into photograph)
+      setTimeout(() => {
+        setPolaroidDeveloped(true);
+      }, 700);
+    }, 1300);
+
+    // Stage 5: Celebration & Thumbs Up
+    setTimeout(() => {
+      setAnimStage('celebrate');
+      setSpeech('Picture Perfect! 🔥');
+      setFilmCount((c) => c + 1);
+    }, 2800);
+
+    // Stage 6: Reset to standby
+    setTimeout(() => {
+      setAnimStage('idle');
+      setSpeech('Ready for next shot!');
+    }, 5200);
   };
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleCameramanClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    soundEngine.playQuickSnap();
-    onSnap();
-    handleSnapAction();
+    if (animStage === 'idle') {
+      onSnap();
+      runFullCameramanSequence();
+    }
   };
 
   return (
     <div
-      onClick={handleClick}
-      className="group relative cursor-pointer select-none filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.7)]"
-      title="Click the cameraman to snap a photo!"
+      onClick={handleCameramanClick}
+      className="group relative cursor-pointer select-none filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.8)]"
+      title="Click our miniature cameraman to roll forward and snap a 4K photo!"
     >
-      {/* Speech / Status Bubble */}
-      <motion.div
-        initial={{ opacity: 0, y: 8, scale: 0.9 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        className="absolute -top-12 left-1/2 -translate-x-1/2 z-30 whitespace-nowrap"
-      >
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0d0e1a]/95 border border-purple-500/50 shadow-xl backdrop-blur-md text-[10px] sm:text-[11px] font-mono text-purple-200">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping shrink-0" />
-          <span className="font-medium text-white">{speechText}</span>
+      {/* 1. Cinematic Pro Camera Slider Track Base */}
+      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-48 sm:w-56 h-4 pointer-events-none z-10 flex flex-col items-center">
+        {/* Dual Carbon-Fiber Slider Rails */}
+        <div className="relative w-full h-2 rounded-full bg-[#0a0a14] border border-purple-500/40 shadow-inner flex items-center justify-between px-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_8px_#a855f7]" />
+          <div className="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_8px_#a855f7]" />
         </div>
-        {/* Tiny downward triangle pointer */}
-        <div className="w-2 h-2 bg-[#0d0e1a] border-r border-b border-purple-500/50 rotate-45 mx-auto -mt-1" />
+        {/* Slider distance measurement ruler markings */}
+        <div className="flex items-center justify-between w-[85%] px-1 text-[7px] font-mono text-purple-400/50 mt-0.5">
+          <span>0cm</span>
+          <span>15cm</span>
+          <span>30cm</span>
+          <span>45cm</span>
+        </div>
+      </div>
+
+      {/* 2. Dynamic Speech & Status Bubble */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="absolute -top-14 left-1/2 -translate-x-1/2 z-40 whitespace-nowrap"
+      >
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0b0c16]/95 border border-purple-500/60 shadow-2xl backdrop-blur-xl text-[10px] sm:text-[11px] font-mono text-purple-200">
+          <span
+            className={`w-2 h-2 rounded-full shrink-0 ${
+              animStage === 'flash'
+                ? 'bg-amber-400 shadow-[0_0_12px_#fbbf24] animate-ping'
+                : animStage === 'aiming'
+                ? 'bg-emerald-400 shadow-[0_0_10px_#34d399] animate-pulse'
+                : 'bg-purple-400'
+            }`}
+          />
+          <span className="font-semibold text-white tracking-tight">{speech}</span>
+        </div>
+        {/* Tooltip triangle */}
+        <div className="w-2.5 h-2.5 bg-[#0b0c16] border-r border-b border-purple-500/60 rotate-45 mx-auto -mt-1.5" />
       </motion.div>
 
-      {/* Crosshair Viewfinder Laser when Aiming */}
+      {/* 3. High-Tech Viewfinder HUD Laser Target (When Aiming) */}
       <AnimatePresence>
-        {isAiming && (
+        {animStage === 'aiming' && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.6 }}
-            animate={{ opacity: 1, scale: [0.9, 1.1, 1] }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="absolute -top-16 -right-16 z-40 pointer-events-none flex items-center justify-center"
+            initial={{ opacity: 0, scale: 0.4 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.4 }}
+            className="absolute -top-24 -right-16 z-50 pointer-events-none flex flex-col items-center"
           >
-            <div className="relative w-16 h-16 flex items-center justify-center">
-              <Crosshair className="w-12 h-12 text-emerald-400 animate-spin text-opacity-80" />
-              <span className="absolute text-[8px] font-mono text-emerald-300 font-bold tracking-tighter bg-black/80 px-1 py-0.5 rounded">
-                [AF-LOCK]
+            <div className="relative w-20 h-20 border border-emerald-400/80 rounded-lg flex items-center justify-center p-1 bg-emerald-950/20 backdrop-blur-[2px]">
+              {/* Corner brackets */}
+              <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-emerald-400" />
+              <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-emerald-400" />
+              <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-emerald-400" />
+              <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-emerald-400" />
+
+              <Crosshair className="w-8 h-8 text-emerald-400 animate-spin" />
+              <span className="absolute bottom-1 text-[7.5px] font-mono text-emerald-300 font-bold tracking-wider bg-black/90 px-1 rounded">
+                [AF-LOCK 9PT]
               </span>
+            </div>
+            <div className="mt-1 flex items-center gap-1.5 px-2 py-0.5 rounded bg-black/85 text-[7px] font-mono text-emerald-400 border border-emerald-500/30">
+              <span>ƒ/1.4</span>
+              <span>•</span>
+              <span>1/500s</span>
+              <span>•</span>
+              <span>ISO 100</span>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Floating Mini Polaroid Ejected on Flash */}
+      {/* 4. REAL CHEMICAL POLAROID PRINT (Ejected from Camera & Developed Live) */}
       <AnimatePresence>
-        {showPolaroid && (
+        {(animStage === 'eject' || animStage === 'celebrate') && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.3, rotate: -15 }}
-            animate={{ opacity: 1, y: -80, scale: 1, rotate: -6 }}
-            exit={{ opacity: 0, y: -120, scale: 0.8, rotate: 10 }}
-            transition={{ type: 'spring', stiffness: 220, damping: 18 }}
-            className="absolute -top-24 -left-10 z-50 pointer-events-none w-28 sm:w-32 p-2 bg-white rounded-lg shadow-2xl border border-slate-200 text-slate-900"
+            initial={{ opacity: 0, y: 10, scale: 0.2, rotate: -25 }}
+            animate={{
+              opacity: 1,
+              y: -95,
+              scale: 1,
+              rotate: -4,
+              transition: { type: 'spring', stiffness: 200, damping: 16 },
+            }}
+            exit={{ opacity: 0, y: -150, scale: 0.7, rotate: 12 }}
+            className="absolute -top-24 -left-12 z-50 pointer-events-none w-32 sm:w-36 p-2.5 bg-slate-50 rounded-lg shadow-[0_25px_50px_rgba(0,0,0,0.9)] border-2 border-slate-200"
           >
-            <div className="w-full h-20 sm:h-24 bg-gradient-to-tr from-purple-900 via-purple-700 to-amber-500 rounded overflow-hidden relative flex items-center justify-center">
+            {/* The Photo Image Window */}
+            <div className="w-full h-24 sm:h-28 bg-[#111] rounded overflow-hidden relative border border-black/20 shadow-inner">
+              {/* Snapshot Thumbnail (Real Candid of Siva) */}
               <img
-                src="/just-candids-mark.png"
-                alt="Captured"
-                className="w-10 h-10 object-contain drop-shadow-md"
+                src="/images/siva-cutout.png"
+                alt="Captured Snapshot"
+                className="w-full h-full object-cover object-top filter contrast-110 saturate-105"
               />
-              <span className="absolute bottom-1 right-1 text-[7px] font-mono text-white/90 bg-black/50 px-1 rounded">
+
+              {/* Chemical Emulsion Developer Overlay (Fades out as it "develops") */}
+              <motion.div
+                initial={{ opacity: 0.95 }}
+                animate={{ opacity: polaroidDeveloped ? 0 : 0.95 }}
+                transition={{ duration: 1.8, ease: 'easeOut' }}
+                className="absolute inset-0 bg-gradient-to-b from-[#2d1b4e] via-[#1a0f30] to-[#0a0515] flex flex-col items-center justify-center pointer-events-none"
+              >
+                <Sparkles className="w-5 h-5 text-purple-300 animate-spin" />
+                <span className="text-[7px] font-mono text-purple-200 mt-1 uppercase tracking-widest font-bold">
+                  DEVELOPING...
+                </span>
+              </motion.div>
+
+              {/* Film Grain & Date Stamp */}
+              <div className="absolute top-1 left-1 px-1 py-0.5 rounded bg-black/60 text-[6.5px] font-mono text-white/90">
                 RAW 4K
-              </span>
+              </div>
             </div>
-            <div className="mt-1.5 flex items-center justify-between text-[8px] font-mono text-slate-600 font-bold">
-              <span>JUST CANDIDS</span>
-              <span>#001</span>
+
+            {/* Polaroid Bottom Paper Margin with Handwritten Metadata */}
+            <div className="mt-2 flex items-center justify-between text-[7.5px] font-mono text-slate-700 font-bold px-0.5">
+              <span className="tracking-tight text-purple-900">JUST CANDIDS</span>
+              <span className="text-slate-500 font-normal">#{String(filmCount).padStart(3, '0')}</span>
+            </div>
+            <div className="text-[6.5px] font-mono text-slate-500 tracking-tighter truncate px-0.5">
+              CANON EOS R10 • 85mm
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Flash Head Pulse Ring when Triggered */}
+      {/* 5. Speedlite Flash Pulse Ring Flare */}
       <AnimatePresence>
-        {cameramanState === 'snapping' && (
+        {animStage === 'flash' && (
           <motion.div
-            initial={{ opacity: 1, scale: 0.2 }}
-            animate={{ opacity: 0, scale: 2.8 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="absolute top-8 right-6 w-16 h-16 rounded-full bg-white pointer-events-none z-40 blur-[4px] mix-blend-screen"
+            initial={{ opacity: 1, scale: 0.1 }}
+            animate={{ opacity: 0, scale: 3.5 }}
+            transition={{ duration: 0.45, ease: 'easeOut' }}
+            className="absolute top-6 right-4 w-20 h-20 rounded-full bg-white pointer-events-none z-50 blur-[3px] mix-blend-screen"
           />
         )}
       </AnimatePresence>
 
-      {/* Stylized Miniature Cameraman SVG Character */}
+      {/* 6. Stylized Living Miniature Cameraman Character */}
       <motion.div
         animate={
-          cameramanState === 'snapping'
-            ? { scale: [1, 1.08, 1], y: [0, -6, 0] }
-            : cameramanState === 'focusing'
-            ? { rotate: [-1, 2, -1], y: [0, -2, 0] }
-            : { y: [0, -3, 0] }
+          animStage === 'dolly_in'
+            ? { x: 25, y: -4, rotate: 3 }
+            : animStage === 'aiming'
+            ? { x: 22, y: -8, scale: 1.06 }
+            : animStage === 'flash'
+            ? { x: 20, y: -10, scale: [1.06, 1.14, 1.06] }
+            : animStage === 'celebrate'
+            ? { x: 10, y: [-4, 0, -4], rotate: [-2, 2, -2] }
+            : { x: dollyPosition, y: [0, -3, 0] }
         }
         transition={
-          cameramanState === 'snapping'
-            ? { duration: 0.35 }
-            : { duration: 3, repeat: Infinity, ease: 'easeInOut' }
+          animStage === 'celebrate'
+            ? { duration: 0.8, repeat: Infinity }
+            : { duration: 0.4, ease: 'easeInOut' }
         }
-        className="w-28 sm:w-32 md:w-36 h-auto transition-transform group-hover:scale-105"
+        className="w-32 sm:w-36 md:w-40 h-auto transition-transform group-hover:scale-105 relative z-20"
       >
         <svg
-          viewBox="0 0 200 240"
+          viewBox="0 0 220 250"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className="w-full h-full"
         >
-          {/* Defs & Gradients */}
           <defs>
-            <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#1e1b4b" />
-              <stop offset="50%" stopColor="#2e1065" />
+            <linearGradient id="camJacketGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#2e1065" />
+              <stop offset="50%" stopColor="#1e1b4b" />
               <stop offset="100%" stopColor="#0f172a" />
             </linearGradient>
-            <linearGradient id="lensGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#334155" />
-              <stop offset="40%" stopColor="#0f172a" />
+            <linearGradient id="proLensGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#475569" />
+              <stop offset="40%" stopColor="#1e293b" />
               <stop offset="100%" stopColor="#020617" />
             </linearGradient>
-            <linearGradient id="glassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.8" />
-              <stop offset="50%" stopColor="#818cf8" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="#c084fc" stopOpacity="0.9" />
+            <linearGradient id="lensOpticGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#38bdf8" />
+              <stop offset="50%" stopColor="#818cf8" />
+              <stop offset="100%" stopColor="#c084fc" />
             </linearGradient>
-            <linearGradient id="skinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#d97706" />
-              <stop offset="100%" stopColor="#b45309" />
+            <linearGradient id="mascotSkin" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#ea580c" />
+              <stop offset="100%" stopColor="#c2410c" />
             </linearGradient>
-            <radialGradient id="flashGlow" cx="50%" cy="50%" r="50%">
+            <radialGradient id="burstFlash" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stopColor="#ffffff" />
-              <stop offset="60%" stopColor="#a855f7" stopOpacity="0.6" />
+              <stop offset="50%" stopColor="#a855f7" stopOpacity="0.8" />
               <stop offset="100%" stopColor="#a855f7" stopOpacity="0" />
             </radialGradient>
           </defs>
 
-          {/* Tripod Stand Under Cameraman */}
-          <g opacity="0.85">
-            {/* Center column */}
-            <line x1="100" y1="160" x2="100" y2="230" stroke="#475569" strokeWidth="4" strokeLinecap="round" />
-            {/* Left leg */}
-            <line x1="100" y1="180" x2="45" y2="235" stroke="#334155" strokeWidth="3.5" strokeLinecap="round" />
-            {/* Right leg */}
-            <line x1="100" y1="180" x2="155" y2="235" stroke="#334155" strokeWidth="3.5" strokeLinecap="round" />
-            {/* Leg joints */}
-            <circle cx="100" cy="180" r="5" fill="#a855f7" />
-            <circle cx="45" cy="235" r="3" fill="#cbd5e1" />
-            <circle cx="155" cy="235" r="3" fill="#cbd5e1" />
-            <circle cx="100" cy="230" r="3" fill="#cbd5e1" />
+          {/* Slider Dolly Carriage Wheels on Rails */}
+          <g>
+            {/* Wheeled Base Platform */}
+            <rect x="80" y="210" width="60" height="10" rx="3" fill="#1e293b" stroke="#64748b" strokeWidth="1" />
+            <circle cx="90" cy="222" r="5" fill="#334155" stroke="#a855f7" strokeWidth="1.5" />
+            <circle cx="130" cy="222" r="5" fill="#334155" stroke="#a855f7" strokeWidth="1.5" />
+            <line x1="88" y1="222" x2="92" y2="222" stroke="#ffffff" strokeWidth="1" />
+            <line x1="128" y1="222" x2="132" y2="222" stroke="#ffffff" strokeWidth="1" />
           </g>
 
-          {/* Cameraman Lower Body / Stool */}
-          <rect x="82" y="145" width="36" height="30" rx="6" fill="#1e293b" />
-          <path d="M85 175 L80 205 L92 205 L95 175 Z" fill="#0f172a" />
-          <path d="M115 175 L120 205 L108 205 L105 175 Z" fill="#0f172a" />
-
-          {/* Torso / Photographer Jacket */}
-          <rect x="74" y="90" width="52" height="60" rx="12" fill="url(#bodyGrad)" stroke="#4c1d95" strokeWidth="2" />
-          {/* Utility vest straps */}
-          <path d="M82 90 L85 145" stroke="#a855f7" strokeWidth="3" opacity="0.7" strokeDasharray="4 2" />
-          <path d="M118 90 L115 145" stroke="#a855f7" strokeWidth="3" opacity="0.7" strokeDasharray="4 2" />
-          <rect x="88" y="125" width="24" height="15" rx="3" fill="#312e81" stroke="#6366f1" strokeWidth="1" />
-
-          {/* Cameraman Head */}
+          {/* Telescopic Tripod Center Mast */}
           <g>
-            {/* Neck */}
-            <rect x="92" y="80" width="16" height="14" rx="3" fill="url(#skinGrad)" />
-            {/* Head circle */}
-            <circle cx="100" cy="68" r="18" fill="url(#skinGrad)" />
-            {/* Backwards Cap */}
-            <path d="M80 62 C80 50 120 50 120 62 L124 64 C128 65 132 64 135 62 L120 62 Z" fill="#7c3aed" />
-            {/* Cap Brim backwards */}
-            <path d="M80 62 C74 61 70 65 67 68 C73 68 78 66 82 63 Z" fill="#5b21b6" />
-            {/* Ear */}
-            <circle cx="83" cy="68" r="3.5" fill="#b45309" />
-            {/* Focus Eye */}
-            <circle cx="110" cy="66" r="3" fill="#0f172a" />
-            <circle cx="111" cy="65" r="1" fill="#ffffff" />
-            {/* Smile */}
-            <path d="M106 74 Q111 78 115 74" stroke="#78350f" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+            <line x1="110" y1="150" x2="110" y2="210" stroke="#475569" strokeWidth="6" strokeLinecap="round" />
+            <rect x="106" y="175" width="8" height="6" rx="1.5" fill="#a855f7" />
           </g>
 
-          {/* Camera Mount & Rig */}
-          <g>
-            {/* Tripod Head Platform */}
-            <rect x="90" y="105" width="45" height="8" rx="2" fill="#475569" />
-            <circle cx="112" cy="109" r="2.5" fill="#fbbf24" />
+          {/* Lower Body & Stool */}
+          <rect x="90" y="145" width="40" height="30" rx="6" fill="#1e293b" />
+          <path d="M92 175 L86 212 L98 212 L102 175 Z" fill="#0f172a" />
+          <path d="M128 175 L134 212 L122 212 L118 175 Z" fill="#0f172a" />
 
-            {/* Professional Camera Body */}
+          {/* Photographer Torso & Utility Gear Vest */}
+          <rect x="82" y="85" width="56" height="65" rx="14" fill="url(#camJacketGrad)" stroke="#6b21a8" strokeWidth="2" />
+          {/* Tactical camera straps */}
+          <path d="M92 85 L95 145" stroke="#c084fc" strokeWidth="3" opacity="0.8" strokeDasharray="4 2" />
+          <path d="M128 85 L125 145" stroke="#c084fc" strokeWidth="3" opacity="0.8" strokeDasharray="4 2" />
+          {/* Lens cleaning pouch */}
+          <rect x="96" y="122" width="28" height="18" rx="3" fill="#3b0764" stroke="#a855f7" strokeWidth="1" />
+
+          {/* Photographer Head & Expressive Character Face */}
+          <g>
+            <rect x="102" y="74" width="16" height="14" rx="3" fill="url(#mascotSkin)" />
+            <circle cx="110" cy="62" r="20" fill="url(#mascotSkin)" />
+
+            {/* Backwards Cap with Embroidered JC Logo */}
+            <path d="M88 56 C88 42 132 42 132 56 L138 58 C142 59 146 58 148 56 L132 56 Z" fill="#7e22ce" />
+            <path d="M88 56 C82 55 77 60 74 63 C80 63 85 61 90 57 Z" fill="#581c87" />
+            {/* Cap Button */}
+            <circle cx="110" cy="42" r="2.5" fill="#facc15" />
+
+            {/* Ears */}
+            <circle cx="91" cy="62" r="4" fill="#c2410c" />
+
+            {/* Eyebrows */}
+            <path
+              d={animStage === 'aiming' ? 'M 115 52 L 126 56' : 'M 115 54 L 125 54'}
+              stroke="#451a03"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+
+            {/* Expressive Focus Eye (Right Eye at Viewfinder) */}
+            {animStage === 'celebrate' ? (
+              // Winking / smiling eye
+              <path d="M 116 62 Q 122 67 127 62" stroke="#451a03" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+            ) : (
+              // Open focused eye
+              <g>
+                <circle cx="121" cy="60" r="4" fill="#0f172a" />
+                <circle cx="122" cy="59" r="1.5" fill="#ffffff" />
+              </g>
+            )}
+
+            {/* Confident Smile */}
+            <path
+              d={animStage === 'celebrate' ? 'M 114 70 Q 122 78 128 70' : 'M 116 70 Q 121 74 126 70'}
+              stroke="#451a03"
+              strokeWidth="2"
+              strokeLinecap="round"
+              fill={animStage === 'celebrate' ? '#ffffff' : 'none'}
+            />
+          </g>
+
+          {/* Full Pro Camera Rig with Canon Lens & Flashgun */}
+          <g>
+            {/* Heavy Pro Camera Body */}
             <rect
-              x="105"
-              y="85"
-              width="44"
-              height="30"
-              rx="5"
-              fill="url(#lensGrad)"
-              stroke="#64748b"
+              x="118"
+              y="78"
+              width="50"
+              height="35"
+              rx="6"
+              fill="url(#proLensGrad)"
+              stroke="#94a3b8"
               strokeWidth="1.5"
             />
-            {/* Grip */}
-            <rect x="141" y="88" width="8" height="24" rx="3" fill="#020617" />
-            {/* Viewfinder Hump */}
-            <path d="M118 85 L124 77 L134 77 L140 85 Z" fill="#1e293b" stroke="#64748b" strokeWidth="1" />
-            {/* Shutter Button with Red Dot */}
-            <rect x="138" y="82" width="6" height="4" rx="1" fill="#ef4444" />
-            {/* Mode Dial */}
-            <rect x="110" y="82" width="7" height="4" rx="1" fill="#94a3b8" />
+            {/* Rubber Grip */}
+            <rect x="160" y="82" width="9" height="28" rx="3.5" fill="#020617" />
+            {/* Viewfinder Prism */}
+            <path d="M132 78 L140 70 L152 70 L160 78 Z" fill="#1e293b" stroke="#64748b" strokeWidth="1" />
+            {/* Shutter Actuation Button */}
+            <rect x="157" y="74" width="7" height="5" rx="1.5" fill="#ef4444" />
+            {/* Knurled Mode Dial */}
+            <rect x="124" y="74" width="8" height="5" rx="1" fill="#cbd5e1" />
 
-            {/* Telephoto Pro Lens */}
+            {/* Optical Lens Barrel with Canon Signature Red Ring */}
             <g>
-              {/* Lens Base Barrel */}
-              <rect x="148" y="90" width="16" height="20" rx="2" fill="#1e293b" />
+              <rect x="167" y="84" width="18" height="24" rx="2" fill="#1e293b" />
               {/* Canon L-Series Signature Red Ring */}
-              <rect x="162" y="90" width="3" height="20" fill="#ef4444" />
-              {/* Zoom & Focus Ribbed Barrel */}
-              <rect x="165" y="89" width="16" height="22" rx="2" fill="url(#lensGrad)" />
-              <line x1="168" y1="91" x2="168" y2="109" stroke="#475569" strokeWidth="1" />
-              <line x1="172" y1="91" x2="172" y2="109" stroke="#475569" strokeWidth="1" />
-              <line x1="176" y1="91" x2="176" y2="109" stroke="#475569" strokeWidth="1" />
-              {/* Front Element Hood */}
-              <path d="M181 87 L190 84 L190 116 L181 113 Z" fill="#0f172a" />
-              {/* Front Curved Glass with Reflection */}
-              <ellipse cx="190" cy="100" rx="3" ry="15" fill="url(#glassGrad)" />
+              <rect x="183" y="84" width="3.5" height="24" fill="#ef4444" />
+              {/* Focus/Zoom Barrel (Extends when Aiming) */}
+              <rect
+                x={animStage === 'aiming' || animStage === 'flash' ? 188 : 186}
+                y="83"
+                width={animStage === 'aiming' || animStage === 'flash' ? 22 : 18}
+                height="26"
+                rx="2"
+                fill="url(#proLensGrad)"
+              />
+              {/* Front Element Glass Curve */}
+              <ellipse
+                cx={animStage === 'aiming' || animStage === 'flash' ? 210 : 204}
+                cy="96"
+                rx="4"
+                ry="17"
+                fill="url(#lensOpticGrad)"
+              />
               <path
-                d="M189 92 Q191 100 189 108"
+                d={animStage === 'aiming' || animStage === 'flash' ? 'M209 86 Q212 96 209 106' : 'M203 86 Q206 96 203 106'}
                 stroke="#ffffff"
-                strokeWidth="1.2"
+                strokeWidth="1.5"
                 strokeLinecap="round"
-                opacity="0.8"
+                opacity="0.85"
               />
             </g>
 
             {/* Hot-Shoe Mounted Speedlite Flashgun */}
             <g>
-              {/* Flash Bracket */}
-              <rect x="123" y="68" width="12" height="9" rx="1.5" fill="#334155" />
-              {/* Flash Head */}
-              <rect
-                x="120"
-                y="52"
-                width="24"
-                height="16"
-                rx="3"
-                fill="#1e293b"
-                stroke="#64748b"
-                strokeWidth="1"
-              />
-              {/* Flash Fresnel Lens Diffuser */}
-              <rect x="138" y="54" width="5" height="12" rx="1" fill="#e2e8f0" opacity="0.9" />
-              {/* Ready LED (Green / Red) */}
+              <rect x="138" y="58" width="14" height="12" rx="2" fill="#334155" />
+              <rect x="134" y="40" width="28" height="18" rx="4" fill="#1e293b" stroke="#64748b" strokeWidth="1" />
+              {/* Fresnel Flash Diffuser */}
+              <rect x="156" y="42" width="6" height="14" rx="1" fill="#f8fafc" opacity="0.9" />
+              {/* Flash Ready LED */}
               <circle
-                cx="124"
-                cy="64"
-                r="1.8"
-                fill={cameramanState === 'snapping' ? '#ef4444' : '#10b981'}
+                cx="139"
+                cy="52"
+                r="2"
+                fill={animStage === 'flash' ? '#ef4444' : '#10b981'}
                 className="animate-pulse"
               />
             </g>
 
-            {/* Photographer Hands Adjusting Lens & Shutter */}
+            {/* Hands (Left hand on lens ring, Right hand on shutter) */}
             <g>
-              {/* Right Hand on Grip & Shutter */}
-              <ellipse cx="144" cy="95" rx="5" ry="7" fill="url(#skinGrad)" />
-              {/* Left Arm & Hand Gripping/Twisting Lens */}
-              <motion.g
-                animate={
-                  cameramanState === 'focusing'
-                    ? { x: [-1, 2, -1], rotate: [0, 4, 0] }
-                    : { x: 0, rotate: 0 }
-                }
-                transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <path d="M85 110 Q120 125 168 108" stroke="url(#bodyGrad)" strokeWidth="7" strokeLinecap="round" fill="none" />
-                <ellipse cx="170" cy="105" rx="6" ry="5" fill="url(#skinGrad)" />
-              </motion.g>
+              <ellipse cx="163" cy="90" rx="5" ry="6" fill="url(#mascotSkin)" />
+              {/* Left arm stretching forward to grip zoom ring */}
+              <path d="M96 110 Q140 125 188 102" stroke="url(#camJacketGrad)" strokeWidth="8" strokeLinecap="round" fill="none" />
+              <ellipse cx="190" cy="100" rx="6" ry="6" fill="url(#mascotSkin)" />
+
+              {/* Celebrating Thumbs-Up Hand when finished */}
+              {animStage === 'celebrate' && (
+                <g>
+                  <circle cx="85" cy="95" r="7" fill="url(#mascotSkin)" />
+                  <rect x="83" y="80" width="5" height="12" rx="2.5" fill="url(#mascotSkin)" />
+                </g>
+              )}
             </g>
           </g>
 
-          {/* Camera Flash Burst FX (Visible when snapping) */}
-          {cameramanState === 'snapping' && (
+          {/* Flash Light Rays & Blast FX */}
+          {animStage === 'flash' && (
             <g>
-              <circle cx="140" cy="60" r="30" fill="url(#flashGlow)" />
-              {/* Light Rays */}
-              <line x1="140" y1="30" x2="140" y2="10" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" />
-              <line x1="165" y1="45" x2="185" y2="35" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" />
-              <line x1="165" y1="75" x2="185" y2="85" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" />
-              <line x1="115" y1="45" x2="95" y2="35" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" />
+              <circle cx="160" cy="50" r="45" fill="url(#burstFlash)" />
+              <line x1="160" y1="20" x2="160" y2="0" stroke="#ffffff" strokeWidth="4" strokeLinecap="round" />
+              <line x1="190" y1="35" x2="215" y2="20" stroke="#ffffff" strokeWidth="4" strokeLinecap="round" />
+              <line x1="190" y1="65" x2="215" y2="80" stroke="#ffffff" strokeWidth="4" strokeLinecap="round" />
+              <line x1="130" y1="35" x2="105" y2="20" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" />
             </g>
           )}
         </svg>
       </motion.div>
 
-      {/* Interactive CTA Pill Below Mascot */}
-      <div className="mt-1 flex items-center justify-center">
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-purple-950/80 border border-purple-500/40 text-[9px] font-mono text-purple-300 group-hover:border-purple-400 group-hover:text-white transition-all shadow-md">
-          <Camera className="w-2.5 h-2.5 text-purple-400" />
-          <span>Click to Snap</span>
+      {/* 7. Interactive Bottom Pill Badge */}
+      <div className="mt-2 flex items-center justify-center">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-950/80 border border-purple-500/50 text-[10px] font-mono text-purple-200 group-hover:border-purple-300 group-hover:text-white transition-all shadow-lg backdrop-blur-md">
+          <Camera className="w-3 h-3 text-purple-300 group-hover:scale-110 transition-transform" />
+          <span>Click to Snap 4K Candid</span>
         </span>
       </div>
     </div>

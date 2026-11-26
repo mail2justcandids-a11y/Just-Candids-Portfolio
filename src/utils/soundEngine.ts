@@ -298,6 +298,86 @@ class SoundEngine {
     osc.start(now);
     osc.stop(now + 0.01);
   }
+
+  /**
+   * 7. POLAROID MOTOR EJECTION (Classic motorized print eject slide)
+   */
+  public playPolaroidEject() {
+    const ctx = this.initContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+
+    // Stepper motor whir
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(320, now);
+    osc.frequency.linearRampToValueAtTime(460, now + 0.18);
+    osc.frequency.linearRampToValueAtTime(260, now + 0.35);
+
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(1200, now);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.4);
+
+    // Friction paper slide transient
+    this.createNoiseTransient(ctx, now + 0.08, 0.22, 1400, 1.8, 0.12);
+  }
+
+  /**
+   * 8. VECTOR ANCHOR SNAP / PEN CHIME
+   */
+  public playVectorPenSnap() {
+    const ctx = this.initContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, now); // A5 note
+    osc.frequency.exponentialRampToValueAtTime(1760, now + 0.08); // Octave jump
+
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.25);
+  }
+
+  /**
+   * 9. LENS STEPPER MOTOR WHIR
+   */
+  public playLensMotorWhir() {
+    const ctx = this.initContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(440, now);
+    osc.frequency.linearRampToValueAtTime(620, now + 0.12);
+
+    gain.gain.setValueAtTime(0.05, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.15);
+  }
 }
 
 export const soundEngine = new SoundEngine();
