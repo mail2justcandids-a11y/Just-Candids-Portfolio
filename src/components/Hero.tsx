@@ -4,8 +4,6 @@ import { Camera, Palette, Sparkles, ArrowRight, ArrowDown, Zap, Sliders, Layers 
 import confetti from 'canvas-confetti';
 import { soundEngine } from '../utils/soundEngine';
 import { PortfolioTab } from '../types';
-import { MiniCameraman } from './MiniCameraman';
-import { DesignElements } from './DesignElements';
 
 interface HeroProps {
   activeTab: PortfolioTab;
@@ -409,33 +407,6 @@ export const Hero: React.FC<HeroProps> = ({
                   className="w-full max-h-[480px] sm:max-h-[580px] lg:max-h-[660px] object-contain object-bottom pointer-events-none"
                 />
               </picture>
-
-              {/* Interactive Character / Studio Elements Overlay (Cleanly positioned beside Siva) */}
-              <div className="absolute bottom-0 -left-6 sm:-left-10 md:-left-14 lg:-left-28 xl:-left-40 2xl:-left-48 z-30 pointer-events-auto scale-90 sm:scale-95 lg:scale-100 origin-bottom-left">
-                <AnimatePresence mode="wait">
-                  {!isDesign ? (
-                    <motion.div
-                      key="cameraman"
-                      initial={{ opacity: 0, scale: 0.85, x: -15 }}
-                      animate={{ opacity: 1, scale: 1, x: 0 }}
-                      exit={{ opacity: 0, scale: 0.85, x: -15 }}
-                      transition={{ duration: 0.35 }}
-                    >
-                      <MiniCameraman isTriggered={isFlashing} onSnap={triggerShutterFlash} />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="design-elements"
-                      initial={{ opacity: 0, scale: 0.85, x: -15 }}
-                      animate={{ opacity: 1, scale: 1, x: 0 }}
-                      exit={{ opacity: 0, scale: 0.85, x: -15 }}
-                      transition={{ duration: 0.35 }}
-                    >
-                      <DesignElements isTriggered={isFlashing} onGlow={triggerShutterFlash} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
             </motion.div>
           </div>
 
