@@ -101,26 +101,10 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
   return (
     <div
       onClick={handleCameramanClick}
-      className="group relative cursor-pointer select-none filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.8)]"
+      className="group relative cursor-pointer select-none flex flex-col items-center filter drop-shadow-[0_20px_40px_rgba(0,0,0,0.85)]"
       title="Click our miniature cameraman to roll forward and snap a 4K photo!"
     >
-      {/* 1. Cinematic Pro Camera Slider Track Base */}
-      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-48 sm:w-56 h-4 pointer-events-none z-10 flex flex-col items-center">
-        {/* Dual Carbon-Fiber Slider Rails */}
-        <div className="relative w-full h-2 rounded-full bg-[#0a0a14] border border-purple-500/40 shadow-inner flex items-center justify-between px-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_8px_#a855f7]" />
-          <div className="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_8px_#a855f7]" />
-        </div>
-        {/* Slider distance measurement ruler markings */}
-        <div className="flex items-center justify-between w-[85%] px-1 text-[7px] font-mono text-purple-400/50 mt-0.5">
-          <span>0cm</span>
-          <span>15cm</span>
-          <span>30cm</span>
-          <span>45cm</span>
-        </div>
-      </div>
-
-      {/* 2. Dynamic Speech & Status Bubble */}
+      {/* 1. Dynamic Speech & Status Bubble */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -142,7 +126,7 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
         <div className="w-2.5 h-2.5 bg-[#0b0c16] border-r border-b border-purple-500/60 rotate-45 mx-auto -mt-1.5" />
       </motion.div>
 
-      {/* 3. High-Tech Viewfinder HUD Laser Target (When Aiming) */}
+      {/* 2. High-Tech Viewfinder HUD Laser Target (When Aiming) */}
       <AnimatePresence>
         {animStage === 'aiming' && (
           <motion.div
@@ -152,7 +136,6 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
             className="absolute -top-24 -right-16 z-50 pointer-events-none flex flex-col items-center"
           >
             <div className="relative w-20 h-20 border border-emerald-400/80 rounded-lg flex items-center justify-center p-1 bg-emerald-950/20 backdrop-blur-[2px]">
-              {/* Corner brackets */}
               <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-emerald-400" />
               <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-emerald-400" />
               <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-emerald-400" />
@@ -174,7 +157,7 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
         )}
       </AnimatePresence>
 
-      {/* 4. REAL CHEMICAL POLAROID PRINT (Ejected from Camera & Developed Live) */}
+      {/* 3. REAL CHEMICAL POLAROID PRINT (Ejected from Camera & Developed Live) */}
       <AnimatePresence>
         {(animStage === 'eject' || animStage === 'celebrate') && (
           <motion.div
@@ -189,16 +172,12 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
             exit={{ opacity: 0, y: -150, scale: 0.7, rotate: 12 }}
             className="absolute -top-24 -left-12 z-50 pointer-events-none w-32 sm:w-36 p-2.5 bg-slate-50 rounded-lg shadow-[0_25px_50px_rgba(0,0,0,0.9)] border-2 border-slate-200"
           >
-            {/* The Photo Image Window */}
             <div className="w-full h-24 sm:h-28 bg-[#111] rounded overflow-hidden relative border border-black/20 shadow-inner">
-              {/* Snapshot Thumbnail (Real Candid of Siva) */}
               <img
                 src="/images/siva-cutout.png"
                 alt="Captured Snapshot"
                 className="w-full h-full object-cover object-top filter contrast-110 saturate-105"
               />
-
-              {/* Chemical Emulsion Developer Overlay (Fades out as it "develops") */}
               <motion.div
                 initial={{ opacity: 0.95 }}
                 animate={{ opacity: polaroidDeveloped ? 0 : 0.95 }}
@@ -210,14 +189,10 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
                   DEVELOPING...
                 </span>
               </motion.div>
-
-              {/* Film Grain & Date Stamp */}
               <div className="absolute top-1 left-1 px-1 py-0.5 rounded bg-black/60 text-[6.5px] font-mono text-white/90">
                 RAW 4K
               </div>
             </div>
-
-            {/* Polaroid Bottom Paper Margin with Handwritten Metadata */}
             <div className="mt-2 flex items-center justify-between text-[7.5px] font-mono text-slate-700 font-bold px-0.5">
               <span className="tracking-tight text-purple-900">JUST CANDIDS</span>
               <span className="text-slate-500 font-normal">#{String(filmCount).padStart(3, '0')}</span>
@@ -229,7 +204,7 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
         )}
       </AnimatePresence>
 
-      {/* 5. Speedlite Flash Pulse Ring Flare */}
+      {/* 4. Speedlite Flash Pulse Ring Flare */}
       <AnimatePresence>
         {animStage === 'flash' && (
           <motion.div
@@ -241,7 +216,7 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
         )}
       </AnimatePresence>
 
-      {/* 6. Stylized Living Miniature Cameraman Character */}
+      {/* 5. Stylized Living Miniature Cameraman Character */}
       <motion.div
         animate={
           animStage === 'dolly_in'
@@ -296,7 +271,6 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
 
           {/* Slider Dolly Carriage Wheels on Rails */}
           <g>
-            {/* Wheeled Base Platform */}
             <rect x="80" y="210" width="60" height="10" rx="3" fill="#1e293b" stroke="#64748b" strokeWidth="1" />
             <circle cx="90" cy="222" r="5" fill="#334155" stroke="#a855f7" strokeWidth="1.5" />
             <circle cx="130" cy="222" r="5" fill="#334155" stroke="#a855f7" strokeWidth="1.5" />
@@ -317,47 +291,32 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
 
           {/* Photographer Torso & Utility Gear Vest */}
           <rect x="82" y="85" width="56" height="65" rx="14" fill="url(#camJacketGrad)" stroke="#6b21a8" strokeWidth="2" />
-          {/* Tactical camera straps */}
           <path d="M92 85 L95 145" stroke="#c084fc" strokeWidth="3" opacity="0.8" strokeDasharray="4 2" />
           <path d="M128 85 L125 145" stroke="#c084fc" strokeWidth="3" opacity="0.8" strokeDasharray="4 2" />
-          {/* Lens cleaning pouch */}
           <rect x="96" y="122" width="28" height="18" rx="3" fill="#3b0764" stroke="#a855f7" strokeWidth="1" />
 
           {/* Photographer Head & Expressive Character Face */}
           <g>
             <rect x="102" y="74" width="16" height="14" rx="3" fill="url(#mascotSkin)" />
             <circle cx="110" cy="62" r="20" fill="url(#mascotSkin)" />
-
-            {/* Backwards Cap with Embroidered JC Logo */}
             <path d="M88 56 C88 42 132 42 132 56 L138 58 C142 59 146 58 148 56 L132 56 Z" fill="#7e22ce" />
             <path d="M88 56 C82 55 77 60 74 63 C80 63 85 61 90 57 Z" fill="#581c87" />
-            {/* Cap Button */}
             <circle cx="110" cy="42" r="2.5" fill="#facc15" />
-
-            {/* Ears */}
             <circle cx="91" cy="62" r="4" fill="#c2410c" />
-
-            {/* Eyebrows */}
             <path
               d={animStage === 'aiming' ? 'M 115 52 L 126 56' : 'M 115 54 L 125 54'}
               stroke="#451a03"
               strokeWidth="2"
               strokeLinecap="round"
             />
-
-            {/* Expressive Focus Eye (Right Eye at Viewfinder) */}
             {animStage === 'celebrate' ? (
-              // Winking / smiling eye
               <path d="M 116 62 Q 122 67 127 62" stroke="#451a03" strokeWidth="2.5" strokeLinecap="round" fill="none" />
             ) : (
-              // Open focused eye
               <g>
                 <circle cx="121" cy="60" r="4" fill="#0f172a" />
                 <circle cx="122" cy="59" r="1.5" fill="#ffffff" />
               </g>
             )}
-
-            {/* Confident Smile */}
             <path
               d={animStage === 'celebrate' ? 'M 114 70 Q 122 78 128 70' : 'M 116 70 Q 121 74 126 70'}
               stroke="#451a03"
@@ -369,7 +328,6 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
 
           {/* Full Pro Camera Rig with Canon Lens & Flashgun */}
           <g>
-            {/* Heavy Pro Camera Body */}
             <rect
               x="118"
               y="78"
@@ -380,21 +338,14 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
               stroke="#94a3b8"
               strokeWidth="1.5"
             />
-            {/* Rubber Grip */}
             <rect x="160" y="82" width="9" height="28" rx="3.5" fill="#020617" />
-            {/* Viewfinder Prism */}
             <path d="M132 78 L140 70 L152 70 L160 78 Z" fill="#1e293b" stroke="#64748b" strokeWidth="1" />
-            {/* Shutter Actuation Button */}
             <rect x="157" y="74" width="7" height="5" rx="1.5" fill="#ef4444" />
-            {/* Knurled Mode Dial */}
             <rect x="124" y="74" width="8" height="5" rx="1" fill="#cbd5e1" />
 
-            {/* Optical Lens Barrel with Canon Signature Red Ring */}
             <g>
               <rect x="167" y="84" width="18" height="24" rx="2" fill="#1e293b" />
-              {/* Canon L-Series Signature Red Ring */}
               <rect x="183" y="84" width="3.5" height="24" fill="#ef4444" />
-              {/* Focus/Zoom Barrel (Extends when Aiming) */}
               <rect
                 x={animStage === 'aiming' || animStage === 'flash' ? 188 : 186}
                 y="83"
@@ -403,7 +354,6 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
                 rx="2"
                 fill="url(#proLensGrad)"
               />
-              {/* Front Element Glass Curve */}
               <ellipse
                 cx={animStage === 'aiming' || animStage === 'flash' ? 210 : 204}
                 cy="96"
@@ -420,13 +370,10 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
               />
             </g>
 
-            {/* Hot-Shoe Mounted Speedlite Flashgun */}
             <g>
               <rect x="138" y="58" width="14" height="12" rx="2" fill="#334155" />
               <rect x="134" y="40" width="28" height="18" rx="4" fill="#1e293b" stroke="#64748b" strokeWidth="1" />
-              {/* Fresnel Flash Diffuser */}
               <rect x="156" y="42" width="6" height="14" rx="1" fill="#f8fafc" opacity="0.9" />
-              {/* Flash Ready LED */}
               <circle
                 cx="139"
                 cy="52"
@@ -436,14 +383,10 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
               />
             </g>
 
-            {/* Hands (Left hand on lens ring, Right hand on shutter) */}
             <g>
               <ellipse cx="163" cy="90" rx="5" ry="6" fill="url(#mascotSkin)" />
-              {/* Left arm stretching forward to grip zoom ring */}
               <path d="M96 110 Q140 125 188 102" stroke="url(#camJacketGrad)" strokeWidth="8" strokeLinecap="round" fill="none" />
               <ellipse cx="190" cy="100" rx="6" ry="6" fill="url(#mascotSkin)" />
-
-              {/* Celebrating Thumbs-Up Hand when finished */}
               {animStage === 'celebrate' && (
                 <g>
                   <circle cx="85" cy="95" r="7" fill="url(#mascotSkin)" />
@@ -453,7 +396,6 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
             </g>
           </g>
 
-          {/* Flash Light Rays & Blast FX */}
           {animStage === 'flash' && (
             <g>
               <circle cx="160" cy="50" r="45" fill="url(#burstFlash)" />
@@ -466,12 +408,110 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
         </svg>
       </motion.div>
 
-      {/* 7. Interactive Bottom Pill Badge */}
-      <div className="mt-2 flex items-center justify-center">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-950/80 border border-purple-500/50 text-[10px] font-mono text-purple-200 group-hover:border-purple-300 group-hover:text-white transition-all shadow-lg backdrop-blur-md">
-          <Camera className="w-3 h-3 text-purple-300 group-hover:scale-110 transition-transform" />
-          <span>Click to Snap 4K Candid</span>
-        </span>
+      {/* 6. Carbon-Fiber Cine-Slider Rails with Bearing Carriage */}
+      <div className="relative w-56 sm:w-64 h-5 -mt-3 z-20 flex flex-col items-center">
+        <div className="relative w-full h-2.5 rounded-full bg-gradient-to-r from-[#0d0e1b] via-[#1a1b2e] to-[#0d0e1b] border border-purple-500/40 shadow-inner flex items-center justify-between px-3">
+          <div className="w-2 h-2 rounded-full bg-purple-400 shadow-[0_0_8px_#a855f7]" />
+          <div className="w-2 h-2 rounded-full bg-purple-400 shadow-[0_0_8px_#a855f7]" />
+        </div>
+        <div className="flex items-center justify-between w-[90%] px-1 text-[7.5px] font-mono text-purple-300/60 mt-0.5">
+          <span>0cm</span>
+          <span>15cm</span>
+          <span>● CENTER</span>
+          <span>45cm</span>
+          <span>60cm</span>
+        </div>
+      </div>
+
+      {/* 7. HEAVY-DUTY CINEMA ROAD CASE RISER STAGE (Grounds the Cameraman firmly) */}
+      <div className="relative w-64 sm:w-72 mt-1 z-20 flex flex-col items-center">
+        {/* Road Case Chassis Box */}
+        <div className="relative w-full rounded-2xl bg-gradient-to-b from-[#161729] via-[#0f101d] to-[#07080f] border-2 border-purple-500/40 p-2.5 shadow-[0_20px_40px_rgba(0,0,0,0.95)] overflow-hidden">
+          {/* Brushed Aluminum Corner Brackets with Rivets */}
+          <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-slate-300 rounded-tl-lg pointer-events-none" />
+          <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-slate-300 rounded-tr-lg pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-slate-300 rounded-bl-lg pointer-events-none" />
+          <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-slate-300 rounded-br-lg pointer-events-none" />
+
+          {/* Flight Case Bevel Striping */}
+          <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-purple-500/25">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" />
+              <span className="text-[9.5px] font-mono font-bold text-slate-200 tracking-tight">
+                JUST CANDIDS • STAGE RIG
+              </span>
+            </div>
+            <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-purple-950/80 border border-purple-500/40 text-purple-300">
+              UNIT #01
+            </span>
+          </div>
+
+          {/* Road Case Face Details: Latches, Power Telemetry & Handle */}
+          <div className="flex items-center justify-between gap-2 px-1 text-[8.5px] font-mono text-slate-400">
+            {/* Recessed Butterfly Twist Latch */}
+            <div className="flex items-center gap-1 bg-black/50 px-2 py-1 rounded-lg border border-white/10">
+              <span className="text-[10px] text-amber-400">🔒</span>
+              <span className="text-slate-300 text-[8px]">LOCKED</span>
+            </div>
+
+            {/* V-Mount 14.8V Cine Power Battery */}
+            <div className="flex items-center gap-1 bg-purple-950/50 px-2 py-1 rounded-lg border border-purple-500/30">
+              <Zap className="w-3 h-3 text-amber-400 shrink-0" />
+              <span className="text-purple-200 text-[8px] font-bold">14.8V // 98%</span>
+            </div>
+
+            {/* Snap Action Button on Deck */}
+            <div className="flex items-center gap-1 bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-lg border border-purple-400/50 text-white font-semibold transition-all">
+              <Camera className="w-3 h-3 text-purple-300" />
+              <span className="text-[8.5px]">SNAP</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 8. Telescopic Chrome Hydraulic Support Struts & Coiled Cables */}
+        <div className="relative w-full h-12 flex justify-between items-start px-6 -mt-0.5 pointer-events-none">
+          {/* Left Hydraulic Damper Column */}
+          <div className="flex flex-col items-center">
+            <div className="w-4 h-8 bg-gradient-to-r from-slate-400 via-slate-200 to-slate-500 rounded-b shadow-md border border-slate-600" />
+            <div className="w-8 h-2.5 bg-[#0a0b14] rounded-full border border-purple-500/40 -mt-1 shadow-lg" />
+          </div>
+
+          {/* Center Coiled Studio Tether Cables (High-Vis Orange + BNC Video) */}
+          <svg
+            viewBox="0 0 100 40"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-24 h-10 overflow-visible"
+          >
+            {/* Orange High-Voltage Studio Cable */}
+            <path
+              d="M 15 0 C 10 25, 45 15, 50 35 C 55 45, 80 25, 95 40"
+              stroke="#f97316"
+              strokeWidth="3"
+              strokeLinecap="round"
+              fill="none"
+              opacity="0.9"
+            />
+            {/* Black Braided BNC SDI Video Cable */}
+            <path
+              d="M 25 0 C 35 30, 20 20, 65 30 C 75 35, 85 38, 90 40"
+              stroke="#475569"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              fill="none"
+              opacity="0.8"
+            />
+          </svg>
+
+          {/* Right Hydraulic Damper Column */}
+          <div className="flex flex-col items-center">
+            <div className="w-4 h-8 bg-gradient-to-r from-slate-400 via-slate-200 to-slate-500 rounded-b shadow-md border border-slate-600" />
+            <div className="w-8 h-2.5 bg-[#0a0b14] rounded-full border border-purple-500/40 -mt-1 shadow-lg" />
+          </div>
+        </div>
+
+        {/* 9. Soft Realistic Studio Floor Contact Shadow */}
+        <div className="w-60 sm:w-68 h-4 rounded-[100%] bg-black/90 blur-[6px] -mt-5 pointer-events-none" />
       </div>
     </div>
   );
