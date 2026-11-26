@@ -160,8 +160,24 @@ export const MiniDesigner: React.FC<MiniDesignerProps> = ({ isTriggered, onGlow 
               <stop offset="100%" stopColor="#ec4899" />
             </linearGradient>
             <linearGradient id="designerSkin" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#ea580c" />
-              <stop offset="100%" stopColor="#c2410c" />
+              <stop offset="0%" stopColor="#f8d7c0" />
+              <stop offset="50%" stopColor="#e2a884" />
+              <stop offset="100%" stopColor="#b8744d" />
+            </linearGradient>
+            <linearGradient id="designerHair" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#342d3d" />
+              <stop offset="40%" stopColor="#1e1828" />
+              <stop offset="100%" stopColor="#0b0813" />
+            </linearGradient>
+            <linearGradient id="designerHighlight" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.8" />
+              <stop offset="50%" stopColor="#ffffff" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#c084fc" stopOpacity="0.6" />
+            </linearGradient>
+            <linearGradient id="silverChain" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#cbd5e1" />
+              <stop offset="50%" stopColor="#ffffff" />
+              <stop offset="100%" stopColor="#94a3b8" />
             </linearGradient>
             <linearGradient id="deskGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#334155" />
@@ -184,45 +200,102 @@ export const MiniDesigner: React.FC<MiniDesignerProps> = ({ isTriggered, onGlow 
           <path d="M92 175 L86 215 L98 215 L102 175 Z" fill="#0f172a" />
           <path d="M128 175 L134 215 L122 215 L118 175 Z" fill="#0f172a" />
 
-          {/* Designer Torso (Oversized Cyber-Hoodie) */}
-          <rect x="82" y="85" width="56" height="65" rx="14" fill="url(#hoodieGrad)" stroke="#7c3aed" strokeWidth="2" />
-          {/* Graphic typography print on hoodie */}
-          <text x="96" y="120" fill="#c084fc" fontSize="9" fontFamily="monospace" fontWeight="bold">
-            DESIGN
+          {/* Designer Torso (Oversized Cyber-Hoodie & Silver Chain) */}
+          <rect x="80" y="86" width="60" height="64" rx="14" fill="url(#hoodieGrad)" stroke="#7c3aed" strokeWidth="1.5" />
+          <path d="M 100 86 L 120 86 L 115 106 L 105 106 Z" fill="#090a12" />
+          {/* Silver Chain Necklace */}
+          <path d="M 102 88 Q 110 102 118 88" stroke="url(#silverChain)" strokeWidth="1.6" fill="none" />
+          <circle cx="110" cy="101" r="1.5" fill="#ffffff" />
+          {/* Minimalist Graphic Brand Typography on Chest */}
+          <text x="96" y="122" fill="#c084fc" fontSize="8" fontFamily="monospace" fontWeight="bold">
+            STUDIO
           </text>
-          <text x="100" y="130" fill="#a855f7" fontSize="7" fontFamily="monospace">
+          <text x="98" y="132" fill="#38bdf8" fontSize="6.5" fontFamily="monospace">
             VECTOR
           </text>
 
-          {/* Designer Head with Glasses & Hair */}
+          {/* Handsome Designer Head, Hair & Wireframe Glasses */}
           <g>
-            <rect x="102" y="74" width="16" height="14" rx="3" fill="url(#designerSkin)" />
-            <circle cx="110" cy="62" r="20" fill="url(#designerSkin)" />
+            <rect x="103" y="74" width="14" height="15" rx="3" fill="url(#designerSkin)" />
+            <path d="M 103 76 L 117 76 L 117 80 L 103 80 Z" fill="#9a5a3a" opacity="0.4" />
 
-            {/* Stylish Streetwear Beanie */}
-            <path d="M88 56 C88 40 132 40 132 56 L134 60 C134 62 130 63 126 63 L94 63 C90 63 86 62 86 60 Z" fill="#2563eb" />
-            <circle cx="110" cy="40" r="3" fill="#38bdf8" />
+            {/* Sculpted Jawline & Face */}
+            <path
+              d="M 94 56 C 94 72, 100 80, 110 80 C 120 80, 126 72, 126 56 C 126 42, 94 42, 94 56 Z"
+              fill="url(#designerSkin)"
+            />
 
-            {/* Ears */}
-            <circle cx="91" cy="62" r="4" fill="#c2410c" />
+            {/* Groomed Stubble along jaw */}
+            <path
+              d="M 96 66 C 99 76, 110 79, 110 79 C 110 79, 121 76, 124 66 C 121 74, 110 77, 110 77 C 110 77, 99 74, 96 66 Z"
+              fill="#422517"
+              opacity="0.38"
+            />
 
-            {/* Glowing AR Designer Glasses */}
+            {/* Siva's Signature Voluminous Modern Wavy Hair */}
             <g>
-              {/* Left Lens */}
-              <rect x="96" y="56" width="12" height="10" rx="2" fill="#06b6d4" fillOpacity="0.4" stroke="#38bdf8" strokeWidth="1.5" />
-              {/* Bridge */}
-              <line x1="108" y1="61" x2="114" y2="61" stroke="#38bdf8" strokeWidth="1.5" />
-              {/* Right Lens */}
-              <rect x="114" y="56" width="12" height="10" rx="2" fill="#06b6d4" fillOpacity="0.4" stroke="#38bdf8" strokeWidth="1.5" />
-              {/* Glow reflection */}
-              <line x1="98" y1="58" x2="102" y2="58" stroke="#ffffff" strokeWidth="1" strokeLinecap="round" />
-              <line x1="116" y1="58" x2="120" y2="58" stroke="#ffffff" strokeWidth="1" strokeLinecap="round" />
+              <ellipse cx="110" cy="50" rx="19" ry="18" fill="url(#designerHair)" />
+              <path
+                d="M 91 52 C 88 32, 102 26, 112 28 C 124 26, 133 34, 131 50 C 128 42, 122 36, 112 36 C 104 36, 96 42, 91 52 Z"
+                fill="url(#designerHair)"
+              />
+              <path
+                d="M 96 38 Q 112 30 126 38"
+                stroke="url(#designerHighlight)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                fill="none"
+              />
+              <path
+                d="M 100 44 Q 114 36 125 44"
+                stroke="url(#designerHighlight)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                fill="none"
+                opacity="0.8"
+              />
+              <path d="M 94 50 L 94 62 L 96 60 L 96 50 Z" fill="#1e1828" />
+              <path d="M 126 50 L 126 62 L 124 60 L 124 50 Z" fill="#1e1828" />
             </g>
 
-            {/* Smile / Concentrated Expression */}
+            {/* Ears with Silver Stud */}
+            <circle cx="93" cy="62" r="3.5" fill="url(#designerSkin)" />
+            <circle cx="93" cy="63" r="1" fill="#ffffff" />
+            <circle cx="127" cy="62" r="3.5" fill="url(#designerSkin)" />
+
+            {/* Groomed Confident Eyebrows */}
+            <path d="M 98 52 Q 104 50 108 53" stroke="#1e1828" strokeWidth="2" strokeLinecap="round" />
+            <path d="M 112 53 Q 116 50 122 52" stroke="#1e1828" strokeWidth="2" strokeLinecap="round" />
+
+            {/* Expressive Almond Eyes with Specular Sparkle */}
+            <g>
+              <ellipse cx="103" cy="59" rx="3.5" ry="4" fill="#090a12" />
+              <circle cx="103" cy="59" r="2.2" fill="#3b2416" />
+              <circle cx="104" cy="58" r="1.1" fill="#ffffff" />
+              <circle cx="102" cy="60.5" r="0.6" fill="#ffffff" />
+
+              <ellipse cx="117" cy="59" rx="3.5" ry="4" fill="#090a12" />
+              <circle cx="117" cy="59" r="2.2" fill="#3b2416" />
+              <circle cx="118" cy="58" r="1.1" fill="#ffffff" />
+              <circle cx="116" cy="60.5" r="0.6" fill="#ffffff" />
+            </g>
+
+            {/* Sleek Designer Round Wireframe Eyeglasses */}
+            <g>
+              <circle cx="103" cy="59" r="7" stroke="#38bdf8" strokeWidth="1.2" fill="#38bdf8" fillOpacity="0.08" />
+              <path d="M 110 58 Q 110 56 110 58" stroke="#38bdf8" strokeWidth="1.2" />
+              <circle cx="117" cy="59" r="7" stroke="#38bdf8" strokeWidth="1.2" fill="#38bdf8" fillOpacity="0.08" />
+              <line x1="99" y1="55" x2="103" y2="55" stroke="#ffffff" strokeWidth="1" strokeLinecap="round" opacity="0.8" />
+              <line x1="113" y1="55" x2="117" y2="55" stroke="#ffffff" strokeWidth="1" strokeLinecap="round" opacity="0.8" />
+            </g>
+
+            {/* Nose Bridge Highlight */}
+            <path d="M 110 58 L 111 64 L 109 65" stroke="#9a5a3a" strokeWidth="1" strokeLinecap="round" fill="none" opacity="0.6" />
+
+            {/* Charismatic Handsome Smile */}
             <path
-              d={animStage === 'celebrate' ? 'M 114 70 Q 120 76 126 70' : 'M 115 70 L 124 70'}
-              stroke="#451a03"
+              d={animStage === 'celebrate' ? 'M 104 70 Q 110 78 116 70' : 'M 105 70 Q 110 74 115 70'}
+              stroke="#582a18"
               strokeWidth="2"
               strokeLinecap="round"
               fill={animStage === 'celebrate' ? '#ffffff' : 'none'}

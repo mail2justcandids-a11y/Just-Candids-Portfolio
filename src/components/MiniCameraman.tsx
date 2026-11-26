@@ -257,8 +257,24 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
               <stop offset="100%" stopColor="#c084fc" />
             </linearGradient>
             <linearGradient id="mascotSkin" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#ea580c" />
-              <stop offset="100%" stopColor="#c2410c" />
+              <stop offset="0%" stopColor="#f8d7c0" />
+              <stop offset="50%" stopColor="#e2a884" />
+              <stop offset="100%" stopColor="#b8744d" />
+            </linearGradient>
+            <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#342d3d" />
+              <stop offset="40%" stopColor="#1e1828" />
+              <stop offset="100%" stopColor="#0b0813" />
+            </linearGradient>
+            <linearGradient id="hairHighlight" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#c084fc" stopOpacity="0.8" />
+              <stop offset="50%" stopColor="#ffffff" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.6" />
+            </linearGradient>
+            <linearGradient id="chainGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#cbd5e1" />
+              <stop offset="50%" stopColor="#ffffff" />
+              <stop offset="100%" stopColor="#94a3b8" />
             </linearGradient>
             <radialGradient id="burstFlash" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stopColor="#ffffff" />
@@ -287,37 +303,95 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
           <path d="M92 175 L86 212 L98 212 L102 175 Z" fill="#0f172a" />
           <path d="M128 175 L134 212 L122 212 L118 175 Z" fill="#0f172a" />
 
-          {/* Photographer Torso & Utility Gear Vest */}
-          <rect x="82" y="85" width="56" height="65" rx="14" fill="url(#camJacketGrad)" stroke="#6b21a8" strokeWidth="2" />
-          <path d="M92 85 L95 145" stroke="#c084fc" strokeWidth="3" opacity="0.8" strokeDasharray="4 2" />
-          <path d="M128 85 L125 145" stroke="#c084fc" strokeWidth="3" opacity="0.8" strokeDasharray="4 2" />
-          <rect x="96" y="122" width="28" height="18" rx="3" fill="#3b0764" stroke="#a855f7" strokeWidth="1" />
+          {/* Photographer Torso & Stylish Studio Jacket */}
+          <rect x="80" y="86" width="60" height="64" rx="14" fill="url(#camJacketGrad)" stroke="#7c3aed" strokeWidth="1.5" />
+          <path d="M 100 86 L 120 86 L 115 106 L 105 106 Z" fill="#090a12" />
+          {/* Sleek Silver Chain Necklace (Modeled after Siva's necklace) */}
+          <path d="M 102 88 Q 110 102 118 88" stroke="url(#chainGrad)" strokeWidth="1.6" fill="none" />
+          <circle cx="110" cy="101" r="1.5" fill="#ffffff" />
+          {/* Tailored lapels & purple satin inner lining */}
+          <path d="M 88 86 L 98 125 L 94 148" stroke="#a855f7" strokeWidth="2.5" opacity="0.8" fill="none" />
+          <path d="M 132 86 L 122 125 L 126 148" stroke="#a855f7" strokeWidth="2.5" opacity="0.8" fill="none" />
+          {/* Slung camera shoulder strap */}
+          <path d="M 80 94 L 140 142" stroke="#18181b" strokeWidth="4.5" opacity="0.9" />
+          <path d="M 80 94 L 140 142" stroke="#a855f7" strokeWidth="1.2" strokeDasharray="3 3" opacity="0.7" />
 
-          {/* Photographer Head & Expressive Character Face */}
+          {/* Handsome Character Head, Voluminous Hair & Facial Features */}
           <g>
-            <rect x="102" y="74" width="16" height="14" rx="3" fill="url(#mascotSkin)" />
-            <circle cx="110" cy="62" r="20" fill="url(#mascotSkin)" />
-            <path d="M88 56 C88 42 132 42 132 56 L138 58 C142 59 146 58 148 56 L132 56 Z" fill="#7e22ce" />
-            <path d="M88 56 C82 55 77 60 74 63 C80 63 85 61 90 57 Z" fill="#581c87" />
-            <circle cx="110" cy="42" r="2.5" fill="#facc15" />
-            <circle cx="91" cy="62" r="4" fill="#c2410c" />
+            <rect x="103" y="74" width="14" height="15" rx="3" fill="url(#mascotSkin)" />
+            <path d="M 103 76 L 117 76 L 117 80 L 103 80 Z" fill="#9a5a3a" opacity="0.4" />
+
+            {/* Sculpted Jawline & Face */}
             <path
-              d={animStage === 'aiming' ? 'M 115 52 L 126 56' : 'M 115 54 L 125 54'}
-              stroke="#451a03"
-              strokeWidth="2"
+              d="M 94 56 C 94 72, 100 80, 110 80 C 120 80, 126 72, 126 56 C 126 42, 94 42, 94 56 Z"
+              fill="url(#mascotSkin)"
+            />
+
+            {/* Groomed Stubble along jaw */}
+            <path
+              d="M 96 66 C 99 76, 110 79, 110 79 C 110 79, 121 76, 124 66 C 121 74, 110 77, 110 77 C 110 77, 99 74, 96 66 Z"
+              fill="#422517"
+              opacity="0.38"
+            />
+
+            {/* Siva's Signature Voluminous Modern Wavy Hair */}
+            <g>
+              <ellipse cx="110" cy="50" rx="19" ry="18" fill="url(#hairGrad)" />
+              <path
+                d="M 91 52 C 88 32, 102 26, 112 28 C 124 26, 133 34, 131 50 C 128 42, 122 36, 112 36 C 104 36, 96 42, 91 52 Z"
+                fill="url(#hairGrad)"
+              />
+              <path
+                d="M 96 38 Q 112 30 126 38"
+                stroke="url(#hairHighlight)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                fill="none"
+              />
+              <path
+                d="M 100 44 Q 114 36 125 44"
+                stroke="url(#hairHighlight)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                fill="none"
+                opacity="0.8"
+              />
+              <path d="M 94 50 L 94 62 L 96 60 L 96 50 Z" fill="#1e1828" />
+              <path d="M 126 50 L 126 62 L 124 60 L 124 50 Z" fill="#1e1828" />
+            </g>
+
+            {/* Ears with Silver Stud */}
+            <circle cx="93" cy="62" r="3.5" fill="url(#mascotSkin)" />
+            <circle cx="93" cy="63" r="1" fill="#ffffff" />
+            <circle cx="127" cy="62" r="3.5" fill="url(#mascotSkin)" />
+
+            {/* Groomed Confident Eyebrows */}
+            <path
+              d={animStage === 'aiming' ? 'M 115 52 L 126 55' : 'M 114 53 Q 120 51 126 54'}
+              stroke="#1e1828"
+              strokeWidth="2.2"
               strokeLinecap="round"
             />
+
+            {/* Expressive Almond Eye with Double Specular Glint */}
             {animStage === 'celebrate' ? (
-              <path d="M 116 62 Q 122 67 127 62" stroke="#451a03" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+              <path d="M 116 61 Q 121 66 126 61" stroke="#1e1828" strokeWidth="2.5" strokeLinecap="round" fill="none" />
             ) : (
               <g>
-                <circle cx="121" cy="60" r="4" fill="#0f172a" />
-                <circle cx="122" cy="59" r="1.5" fill="#ffffff" />
+                <ellipse cx="121" cy="59" rx="3.5" ry="4" fill="#090a12" />
+                <circle cx="121" cy="59" r="2.5" fill="#3b2416" />
+                <circle cx="122" cy="58" r="1.2" fill="#ffffff" />
+                <circle cx="120" cy="60.5" r="0.6" fill="#ffffff" />
               </g>
             )}
+
+            {/* Nose Bridge Highlight */}
+            <path d="M 116 58 L 118 64 L 115 65" stroke="#9a5a3a" strokeWidth="1" strokeLinecap="round" fill="none" opacity="0.6" />
+
+            {/* Charismatic Handsome Smile */}
             <path
-              d={animStage === 'celebrate' ? 'M 114 70 Q 122 78 128 70' : 'M 116 70 Q 121 74 126 70'}
-              stroke="#451a03"
+              d={animStage === 'celebrate' ? 'M 113 70 Q 120 78 127 70' : 'M 114 70 Q 120 74 126 69'}
+              stroke="#582a18"
               strokeWidth="2"
               strokeLinecap="round"
               fill={animStage === 'celebrate' ? '#ffffff' : 'none'}
