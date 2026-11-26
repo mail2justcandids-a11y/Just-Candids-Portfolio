@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://justcandids.com/</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://justcandids.com/just-candids-logo.png</image:loc>
+      <image:title>Just Candids Official Logo</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://justcandids.com/siva_profile.jpg</image:loc>
+      <image:title>Siva Subramaniyam - Just Candids Founder &amp; Creative Lead</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://justcandids.com/photos/siva_frame_01.jpg</image:loc>
+      <image:title>Royal Vermilion Bridal Elegance - Candid Photography by Siva Subramaniyam</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://justcandids.com/photos/siva_frame_02.jpg</image:loc>
+      <image:title>Golden Hour Haldi Radiance - Candid Photography by Siva Subramaniyam</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://justcandids.com/photos/siva_frame_03.jpg</image:loc>
+      <image:title>Traditional Temple Veil Portrait - Candid Photography by Siva Subramaniyam</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://justcandids.com/designs/graduation-day-banner.jpg</image:loc>
+      <image:title>Graduation Day Panorama Banner - Graphic Design by Siva Subramaniyam</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://justcandids.com/designs/rotary-ryla-guideline.jpg</image:loc>
+      <image:title>Rotary RYLA Identity &amp; Guideline Poster - Graphic Design by Siva Subramaniyam</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://justcandids.com/designs/national-conference-certificate.jpg</image:loc>
+      <image:title>National Conference Commemorative Certificate - Graphic Design by Siva Subramaniyam</image:title>
+    </image:image>
+  </url>
+</urlset>

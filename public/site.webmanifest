@@ -1,0 +1,21 @@
+{
+  "name": "Just Candids by Siva Subramaniyam",
+  "short_name": "Just Candids",
+  "description": "Fine-Art Candid Photography & Graphic Design Portfolio by Siva Subramaniyam",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050508",
+  "theme_color": "#050508",
+  "icons": [
+    {
+      "src": "/just-candids-mark.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/just-candids-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
