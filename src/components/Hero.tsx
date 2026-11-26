@@ -122,20 +122,24 @@ export const Hero: React.FC<HeroProps> = ({
 
       // Left celebratory cannon
       confetti({
-        particleCount: 75,
+        particleCount: 80,
         angle: 60,
-        spread: 65,
-        origin: { x: 0.1, y: 0.7 },
+        spread: 70,
+        origin: { x: 0.15, y: 0.7 },
         colors,
+        zIndex: 99999,
+        disableForReducedMotion: false,
       });
 
       // Right celebratory cannon
       confetti({
-        particleCount: 75,
+        particleCount: 80,
         angle: 120,
-        spread: 65,
-        origin: { x: 0.9, y: 0.7 },
+        spread: 70,
+        origin: { x: 0.85, y: 0.7 },
         colors,
+        zIndex: 99999,
+        disableForReducedMotion: false,
       });
 
       // Center high-burst golden fireworks
@@ -144,9 +148,11 @@ export const Hero: React.FC<HeroProps> = ({
         spread: 100,
         origin: { x: 0.5, y: 0.45 },
         colors,
+        zIndex: 99999,
+        disableForReducedMotion: false,
       });
     } catch (err) {
-      // Ignore
+      console.warn('Confetti burst error:', err);
     }
 
     setTimeout(() => setIsFlashing(false), 380);
@@ -275,21 +281,18 @@ export const Hero: React.FC<HeroProps> = ({
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0 text-purple-200" />
                   </button>
 
-                  {/* Prominent Snap Flash Button with Poppers */}
+                  {/* Clean Prominent Snap Flash Button */}
                   <button
                     onClick={triggerShutterFlash}
                     className="group relative inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 rounded-full font-nav font-bold text-xs sm:text-sm tracking-wide bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-black border border-amber-200 shadow-xl shadow-amber-500/30 hover:shadow-amber-400/50 hover:scale-[1.04] active:scale-[0.98] transition-all cursor-pointer select-none"
-                    title="Click to trigger camera shutter flash & celebratory poppers!"
+                    title="Click to trigger camera shutter flash"
                   >
-                    <span className="relative flex h-2.5 w-2.5 shrink-0">
+                    <span className="relative flex h-2 w-2 shrink-0">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-black" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-black" />
                     </span>
                     <Zap className="w-4 h-4 text-black group-hover:scale-110 transition-transform filter drop-shadow-[0_0_4px_rgba(0,0,0,0.5)]" />
                     <span>Snap Flash</span>
-                    <span className="text-[10px] font-mono font-extrabold px-1.5 py-0.5 rounded-md bg-black/20 text-black uppercase tracking-wider">
-                      Poppers! 📸
-                    </span>
                   </button>
 
                   <button
@@ -332,21 +335,18 @@ export const Hero: React.FC<HeroProps> = ({
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0 text-purple-200" />
                   </button>
 
-                  {/* Prominent Snap Flash Button with Poppers */}
+                  {/* Clean Prominent Snap Flash Button */}
                   <button
                     onClick={triggerShutterFlash}
                     className="group relative inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 rounded-full font-nav font-bold text-xs sm:text-sm tracking-wide bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-black border border-amber-200 shadow-xl shadow-amber-500/30 hover:shadow-amber-400/50 hover:scale-[1.04] active:scale-[0.98] transition-all cursor-pointer select-none"
-                    title="Click to fire studio shutter flash & celebratory poppers!"
+                    title="Click to fire studio shutter flash"
                   >
-                    <span className="relative flex h-2.5 w-2.5 shrink-0">
+                    <span className="relative flex h-2 w-2 shrink-0">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-black" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-black" />
                     </span>
                     <Zap className="w-4 h-4 text-black group-hover:scale-110 transition-transform filter drop-shadow-[0_0_4px_rgba(0,0,0,0.5)]" />
                     <span>Snap Flash</span>
-                    <span className="text-[10.5px] font-mono font-extrabold px-1.5 py-0.5 rounded-md bg-black/20 text-black uppercase tracking-wider">
-                      Poppers! 📸
-                    </span>
                   </button>
 
                   <button
@@ -410,41 +410,6 @@ export const Hero: React.FC<HeroProps> = ({
                   })}
                 </div>
               </div>
-
-              {/* Prominent High-Speed Studio Shutter & Popper Trigger Button */}
-              <button
-                onClick={triggerShutterFlash}
-                className={`group relative inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-nav font-bold tracking-wide transition-all active:scale-95 shadow-xl shrink-0 select-none cursor-pointer border ${
-                  isDesign
-                    ? 'bg-gradient-to-r from-purple-600 via-fuchsia-600 to-purple-700 hover:from-purple-500 hover:to-fuchsia-500 text-white border-purple-400/70 shadow-purple-600/40 hover:shadow-purple-500/60'
-                    : 'bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-black border-amber-200 shadow-amber-500/40 hover:shadow-amber-400/60'
-                }`}
-                title={isDesign ? "Click to trigger creative vector glow & celebratory poppers!" : "Click to fire high-speed studio flash & celebratory poppers!"}
-              >
-                {/* Live Shutter Indicator Light */}
-                <span className="relative flex h-2.5 w-2.5 shrink-0">
-                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                    isDesign ? 'bg-fuchsia-300' : 'bg-black'
-                  }`} />
-                  <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
-                    isDesign ? 'bg-white' : 'bg-black'
-                  }`} />
-                </span>
-
-                <Zap className={`w-4 h-4 group-hover:scale-110 transition-transform filter ${
-                  isDesign ? 'text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.9)]' : 'text-black'
-                }`} />
-
-                <span className="font-semibold tracking-wide">
-                  Snap Flash
-                </span>
-
-                <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider ${
-                  isDesign ? 'bg-white/20 text-white' : 'bg-black/20 text-black'
-                }`}>
-                  Poppers! 📸
-                </span>
-              </button>
             </div>
 
           </div>
@@ -492,7 +457,7 @@ export const Hero: React.FC<HeroProps> = ({
               <button
                 onClick={triggerShutterFlash}
                 className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-20 group inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-black/90 hover:bg-black text-white shadow-2xl backdrop-blur-md text-[11px] sm:text-xs font-mono tracking-wider transition-all hover:scale-105 active:scale-95 cursor-pointer border border-amber-400/70 hover:border-amber-300 shadow-amber-500/30"
-                title="Click to fire studio shutter flash & poppers"
+                title="Click to fire studio shutter flash"
               >
                 <span className="w-2.5 h-2.5 rounded-full animate-ping bg-amber-400 opacity-75" />
                 <span className="font-bold text-amber-200 group-hover:text-amber-100 flex items-center gap-1.5">
