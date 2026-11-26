@@ -46,17 +46,27 @@ export const DarkroomLab: React.FC = () => {
 
   const filmstripRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
+  const isInitialMount = useRef(true);
 
   const photo = PHOTOGRAPHY_WORKS[selectedPhotoIndex];
   const totalFrames = PHOTOGRAPHY_WORKS.length;
   const isMonochromeCapture = ['siva-frame-06', 'siva-frame-07', 'siva-frame-17'].includes(photo.id);
 
-  // Auto-scroll active thumbnail into view in filmstrip
+  // Auto-scroll active thumbnail into view in filmstrip container only (never scrolls the main window)
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     if (filmstripRef.current) {
       const activeThumb = filmstripRef.current.children[selectedPhotoIndex] as HTMLElement;
       if (activeThumb) {
-        activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        const container = filmstripRef.current;
+        const thumbLeft = activeThumb.offsetLeft;
+        const thumbWidth = activeThumb.offsetWidth;
+        const containerWidth = container.offsetWidth;
+        const targetScrollLeft = thumbLeft - containerWidth / 2 + thumbWidth / 2;
+        container.scrollTo({ left: targetScrollLeft, behavior: 'smooth' });
       }
     }
   }, [selectedPhotoIndex]);

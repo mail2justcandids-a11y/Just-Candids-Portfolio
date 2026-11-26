@@ -19,6 +19,11 @@ export const App: React.FC = () => {
 
   // Initialize Lenis Smooth Kinetic Scrolling
   useEffect(() => {
+    // Ensure clean start at the top on page load/refresh unless a specific anchor hash is present
+    if (!window.location.hash) {
+      window.scrollTo(0, 0);
+    }
+
     // Respect user's reduced motion preferences
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
