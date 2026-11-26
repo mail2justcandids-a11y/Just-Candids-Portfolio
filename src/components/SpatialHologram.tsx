@@ -51,19 +51,18 @@ export const SpatialHologram: React.FC<SpatialHologramProps> = ({ isTriggered, o
       className="group relative cursor-pointer select-none flex flex-col items-center filter drop-shadow-[0_20px_45px_rgba(0,0,0,0.9)]"
       title="Click the spatial hologram to trigger 3D vector illumination!"
     >
-      {/* 1. Spatial Telemetry Bubble */}
+      {/* 1. Spatial Telemetry Bubble (Normal layout flow - zero overlap) */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
-        className="absolute -top-14 left-1/2 -translate-x-1/2 z-40 whitespace-nowrap"
+        className="z-40 mb-2 whitespace-nowrap"
       >
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#090b16]/95 border border-cyan-500/50 shadow-2xl backdrop-blur-xl text-[10px] sm:text-[11px] font-mono text-cyan-200">
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#090b16]/95 border border-cyan-500/50 shadow-xl backdrop-blur-xl text-[10px] sm:text-[11px] font-mono text-cyan-200">
           <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_#22d3ee] animate-ping shrink-0" />
           <span className="font-semibold text-white tracking-tight">
             {isActive ? '✦ 3D VECTOR BEAM LOCKED' : 'Spatial Studio // φ = 1.618'}
           </span>
         </div>
-        <div className="w-2.5 h-2.5 bg-[#090b16] border-r border-b border-cyan-500/50 rotate-45 mx-auto -mt-1.5" />
       </motion.div>
 
       {/* 2. Floating 3D Spatial Hologram Core Stage */}

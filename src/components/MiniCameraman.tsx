@@ -104,13 +104,13 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
       className="group relative cursor-pointer select-none flex flex-col items-center filter drop-shadow-[0_20px_40px_rgba(0,0,0,0.85)]"
       title="Click our miniature cameraman to roll forward and snap a 4K photo!"
     >
-      {/* 1. Dynamic Speech & Status Bubble */}
+      {/* 1. Dynamic Speech & Status Bubble (Normal layout flow - zero overlap) */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
-        className="absolute -top-14 left-1/2 -translate-x-1/2 z-40 whitespace-nowrap"
+        className="z-40 mb-2 whitespace-nowrap"
       >
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0b0c16]/95 border border-purple-500/60 shadow-2xl backdrop-blur-xl text-[10px] sm:text-[11px] font-mono text-purple-200">
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0b0c16]/95 border border-purple-500/60 shadow-xl backdrop-blur-xl text-[10px] sm:text-[11px] font-mono text-purple-200">
           <span
             className={`w-2 h-2 rounded-full shrink-0 ${
               animStage === 'flash'
@@ -122,8 +122,6 @@ export const MiniCameraman: React.FC<MiniCameramanProps> = ({ isTriggered, onSna
           />
           <span className="font-semibold text-white tracking-tight">{speech}</span>
         </div>
-        {/* Tooltip triangle */}
-        <div className="w-2.5 h-2.5 bg-[#0b0c16] border-r border-b border-purple-500/60 rotate-45 mx-auto -mt-1.5" />
       </motion.div>
 
       {/* 2. High-Tech Viewfinder HUD Laser Target (When Aiming) */}
