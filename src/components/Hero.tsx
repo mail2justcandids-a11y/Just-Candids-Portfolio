@@ -105,24 +105,45 @@ export const Hero: React.FC<HeroProps> = ({
     rawMouseY.set(20);
   };
 
-  // Interactive Shutter Flash Trigger with Sparkling Golden Poppers & Mechanical Audio
+  // Interactive Shutter Flash Trigger with Dual Celebratory Poppers & Mechanical Audio
   const triggerShutterFlash = () => {
     soundEngine.playMechanicalShutter();
     setIsFlashing(true);
     setFlashMessage(
       isDesign
         ? '✦ Vector Artboard Rendered in 300 DPI!'
-        : '📸 Candid Moment Captured in 4K RAW!'
+        : '📸 4K RAW Candid Captured • 1/250s ƒ/1.4 ISO 100'
     );
 
     try {
+      const colors = isDesign
+        ? ['#c084fc', '#a855f7', '#e879f9', '#ffd700', '#ffffff', '#38bdf8']
+        : ['#ffd700', '#f59e0b', '#d4af37', '#fef08a', '#fbbf24', '#ffffff', '#ffedd5'];
+
+      // Left celebratory cannon
       confetti({
-        particleCount: 110,
-        spread: 85,
-        origin: { y: 0.5 },
-        colors: isDesign
-          ? ['#c084fc', '#a855f7', '#e879f9', '#ffd700', '#ffffff']
-          : ['#ffd700', '#f59e0b', '#d4af37', '#fef08a', '#fbbf24', '#ffffff'],
+        particleCount: 75,
+        angle: 60,
+        spread: 65,
+        origin: { x: 0.1, y: 0.7 },
+        colors,
+      });
+
+      // Right celebratory cannon
+      confetti({
+        particleCount: 75,
+        angle: 120,
+        spread: 65,
+        origin: { x: 0.9, y: 0.7 },
+        colors,
+      });
+
+      // Center high-burst golden fireworks
+      confetti({
+        particleCount: 90,
+        spread: 100,
+        origin: { x: 0.5, y: 0.45 },
+        colors,
       });
     } catch (err) {
       // Ignore
@@ -356,14 +377,39 @@ export const Hero: React.FC<HeroProps> = ({
                 </div>
               </div>
 
-              {/* Shutter Trigger Button */}
+              {/* Prominent High-Speed Studio Shutter & Popper Trigger Button */}
               <button
                 onClick={triggerShutterFlash}
-                className="liquid-glass-track group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-purple-200 hover:text-white hover:border-purple-400/60 text-[10.5px] sm:text-xs font-nav font-medium tracking-wide transition-all active:scale-95 shadow-md shrink-0"
-                title={isDesign ? "Trigger creative vector glow" : "Trigger a high-speed studio flash effect"}
+                className={`group relative inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-nav font-bold tracking-wide transition-all active:scale-95 shadow-xl shrink-0 select-none cursor-pointer border ${
+                  isDesign
+                    ? 'bg-gradient-to-r from-purple-600 via-fuchsia-600 to-purple-700 hover:from-purple-500 hover:to-fuchsia-500 text-white border-purple-400/70 shadow-purple-600/40 hover:shadow-purple-500/60'
+                    : 'bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-black border-amber-200 shadow-amber-500/40 hover:shadow-amber-400/60'
+                }`}
+                title={isDesign ? "Click to trigger creative vector glow & celebratory poppers!" : "Click to fire high-speed studio flash & celebratory poppers!"}
               >
-                <Zap className="w-3.5 h-3.5 text-purple-300 group-hover:scale-110 transition-transform filter drop-shadow-[0_0_5px_rgba(192,132,252,0.8)]" />
-                <span>{isDesign ? 'Vector Glow' : 'Snap Flash'}</span>
+                {/* Live Shutter Indicator Light */}
+                <span className="relative flex h-2.5 w-2.5 shrink-0">
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                    isDesign ? 'bg-fuchsia-300' : 'bg-black'
+                  }`} />
+                  <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
+                    isDesign ? 'bg-white' : 'bg-black'
+                  }`} />
+                </span>
+
+                <Zap className={`w-4 h-4 group-hover:scale-110 transition-transform filter ${
+                  isDesign ? 'text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.9)]' : 'text-black'
+                }`} />
+
+                <span className="font-semibold tracking-wide">
+                  {isDesign ? 'Trigger Vector Glow' : 'Snap 4K Flash'}
+                </span>
+
+                <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider ${
+                  isDesign ? 'bg-white/20 text-white' : 'bg-black/20 text-black'
+                }`}>
+                  Poppers! 📸
+                </span>
               </button>
             </div>
 
@@ -407,6 +453,24 @@ export const Hero: React.FC<HeroProps> = ({
                   className="w-full max-h-[480px] sm:max-h-[580px] lg:max-h-[660px] object-contain object-bottom pointer-events-none"
                 />
               </picture>
+
+              {/* Interactive Viewfinder Shutter HUD Badge on Portrait */}
+              <button
+                onClick={triggerShutterFlash}
+                className={`absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-20 group inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/85 hover:bg-black text-white shadow-2xl backdrop-blur-md text-[10.5px] sm:text-xs font-mono tracking-wider transition-all hover:scale-105 active:scale-95 cursor-pointer border ${
+                  isDesign
+                    ? 'border-purple-400/60 hover:border-fuchsia-300 shadow-purple-500/30'
+                    : 'border-amber-400/60 hover:border-amber-300 shadow-amber-500/30'
+                }`}
+                title={isDesign ? "Click to trigger creative vector glow & poppers" : "Click to fire studio shutter flash & poppers"}
+              >
+                <span className={`w-2 h-2 rounded-full animate-pulse shadow-sm ${
+                  isDesign ? 'bg-fuchsia-400 shadow-fuchsia-400' : 'bg-amber-400 shadow-amber-400'
+                }`} />
+                <span className={`font-bold ${isDesign ? 'text-purple-200 group-hover:text-white' : 'text-amber-200 group-hover:text-amber-100'}`}>
+                  {isDesign ? '✦ CLICK TO GLOW' : '📸 CLICK TO SNAP'}
+                </span>
+              </button>
             </motion.div>
           </div>
 
