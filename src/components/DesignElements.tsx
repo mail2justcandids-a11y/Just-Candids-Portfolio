@@ -26,7 +26,7 @@ export const DesignElements: React.FC<DesignElementsProps> = ({ isTriggered, onG
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-2 z-50 flex items-center gap-1 p-1 rounded-2xl bg-[#090a16]/95 border border-purple-500/40 shadow-xl backdrop-blur-xl"
+        className="mb-3.5 z-50 flex items-center gap-1 p-1 rounded-2xl bg-[#090a16]/95 border border-purple-500/50 shadow-xl backdrop-blur-xl"
       >
         <button
           onClick={() => handleModeChange('artist')}

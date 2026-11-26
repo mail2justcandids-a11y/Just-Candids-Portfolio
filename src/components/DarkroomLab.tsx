@@ -44,6 +44,11 @@ export const DarkroomLab: React.FC = () => {
     initialPanY: 0,
   });
 
+  // RAW vs Graded Split Comparison State
+  const [isSplitMode, setIsSplitMode] = useState<boolean>(false);
+  const [splitRatio, setSplitRatio] = useState<number>(50);
+  const isDraggingSplit = useRef<boolean>(false);
+
   const filmstripRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const isInitialMount = useRef(true);
@@ -122,6 +127,48 @@ export const DarkroomLab: React.FC = () => {
   };
 
   // Drag-to-Pan Handlers (Mouse & Touch)
+  const handleSplitMove = useCallback(
+    (clientX: number) => {
+      if (!isDraggingSplit.current || !viewportRef.current) return;
+      const rect = viewportRef.current.getBoundingClientRect();
+      const relativeX = clientX - rect.left;
+      const pct = Math.max(5, Math.min(95, Math.round((relativeX / rect.width) * 100)));
+      setSplitRatio(pct);
+    },
+    []
+  );
+
+  useEffect(() => {
+    const handleWindowMouseMove = (e: MouseEvent) => {
+      if (isDraggingSplit.current) {
+        handleSplitMove(e.clientX);
+      }
+    };
+    const handleWindowMouseUp = () => {
+      isDraggingSplit.current = false;
+    };
+    const handleWindowTouchMove = (e: TouchEvent) => {
+      if (isDraggingSplit.current && e.touches.length > 0) {
+        handleSplitMove(e.touches[0].clientX);
+      }
+    };
+    const handleWindowTouchEnd = () => {
+      isDraggingSplit.current = false;
+    };
+
+    window.addEventListener('mousemove', handleWindowMouseMove);
+    window.addEventListener('mouseup', handleWindowMouseUp);
+    window.addEventListener('touchmove', handleWindowTouchMove);
+    window.addEventListener('touchend', handleWindowTouchEnd);
+
+    return () => {
+      window.removeEventListener('mousemove', handleWindowMouseMove);
+      window.removeEventListener('mouseup', handleWindowMouseUp);
+      window.removeEventListener('touchmove', handleWindowTouchMove);
+      window.removeEventListener('touchend', handleWindowTouchEnd);
+    };
+  }, [handleSplitMove]);
+
   const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(true);
@@ -272,8 +319,27 @@ export const DarkroomLab: React.FC = () => {
                   </span>
                 </div>
 
-                {/* Right: Fit Toggle, Zoom Controls, Reset */}
+                {/* Right: Split Mode Toggle, Fit Toggle, Zoom Controls, Reset */}
                 <div className="flex items-center gap-1.5 sm:gap-2">
+                  {/* RAW vs Graded Split Slider Toggle */}
+                  <button
+                    onClick={() => {
+                      soundEngine.playDialClick();
+                      setIsSplitMode((prev) => !prev);
+                    }}
+                    title="Toggle RAW vs Graded Split Comparison"
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-medium transition-all ${
+                      isSplitMode
+                        ? 'bg-gradient-to-r from-amber-500 to-purple-600 text-white shadow-md shadow-purple-600/30'
+                        : 'bg-[#121324] text-slate-300 hover:text-white border border-purple-500/20'
+                    }`}
+                  >
+                    <Sliders className="w-3 h-3 text-amber-300" />
+                    <span className="font-['Neue_Montreal'] text-xs font-semibold">
+                      {isSplitMode ? 'Split: ON' : 'RAW vs Graded'}
+                    </span>
+                  </button>
+
                   {/* Fit Whole Photo vs Fill/Pan */}
                   <button
                     onClick={handleToggleFitMode}
@@ -384,13 +450,81 @@ export const DarkroomLab: React.FC = () => {
                   />
                 </div>
 
+                {/* RAW Sensor Overlay Layer (Split View Mode) */}
+                {isSplitMode && (
+                  <div
+                    className="absolute inset-0 pointer-events-none z-20 overflow-hidden"
+                    style={{
+                      clipPath: `polygon(0 0, ${splitRatio}% 0, ${splitRatio}% 100%, 0 100%)`,
+                    }}
+                  >
+                    <div
+                      className="w-full h-full flex items-center justify-center transition-transform duration-75 ease-out"
+                      style={{
+                        transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+                        transformOrigin: 'center center',
+                      }}
+                    >
+                      <img
+                        src={photo.imageUrl}
+                        alt="Flat RAW Sensor"
+                        draggable={false}
+                        style={{
+                          filter: 'contrast(88%) brightness(96%) saturate(78%) sepia(4%)',
+                          objectFit: fitMode === 'fit' ? 'contain' : 'cover',
+                          objectPosition:
+                            photo.focalPoint ||
+                            (photo.aspectRatio === 'portrait' ? 'center 22%' : 'center center'),
+                        }}
+                        className={`w-full h-full pointer-events-none transition-all duration-200 ${
+                          fitMode === 'fit' ? 'max-h-full max-w-full drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)]' : ''
+                        }`}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Draggable Split Divider Line & Handle */}
+                {isSplitMode && (
+                  <div
+                    className="absolute top-0 bottom-0 z-30 pointer-events-auto cursor-ew-resize flex items-center justify-center select-none group"
+                    style={{ left: `${splitRatio}%`, transform: 'translateX(-50%)' }}
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      isDraggingSplit.current = true;
+                    }}
+                    onTouchStart={(e) => {
+                      e.stopPropagation();
+                      isDraggingSplit.current = true;
+                    }}
+                  >
+                    {/* Glowing Vertical Divider Line */}
+                    <div className="w-[2px] h-full bg-gradient-to-b from-amber-400 via-white to-purple-400 shadow-[0_0_10px_rgba(255,255,255,0.9)]" />
+
+                    {/* Draggable Center Knob */}
+                    <div className="absolute w-8 h-8 rounded-full bg-black/90 border-2 border-white shadow-[0_4px_16px_rgba(0,0,0,0.95)] flex items-center justify-center text-xs text-white font-bold group-hover:scale-115 transition-transform backdrop-blur-md">
+                      ⇄
+                    </div>
+                  </div>
+                )}
+
                 {/* Viewport Info Overlay Top Left */}
                 <div className="absolute top-3 left-3 flex flex-wrap items-center gap-1.5 sm:gap-2 max-w-[70%] sm:max-w-[80%] pointer-events-none">
-                  <div className="flex items-center gap-2 bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-purple-500/30 text-[10px] sm:text-[11px] font-mono text-white leading-none">
-                    <span className="w-2 h-2 rounded-full bg-purple-400 shadow-sm shadow-purple-400" />
-                    <span>JUST CANDIDS • {profile.toUpperCase()}</span>
-                    <span className="text-purple-300/80 uppercase">({photo.aspectRatio})</span>
-                  </div>
+                  {isSplitMode ? (
+                    <div className="flex items-center gap-2 bg-black/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-amber-500/50 text-[10px] sm:text-[11px] font-mono text-amber-200 leading-none shadow-lg">
+                      <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shadow-sm shadow-amber-400" />
+                      <span className="font-bold">RAW SENSOR (FLAT)</span>
+                      <span className="text-slate-400">vs</span>
+                      <span className="text-purple-300 font-bold">COLOR GRADED</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-purple-500/30 text-[10px] sm:text-[11px] font-mono text-white leading-none">
+                      <span className="w-2 h-2 rounded-full bg-purple-400 shadow-sm shadow-purple-400" />
+                      <span>JUST CANDIDS • {profile.toUpperCase()}</span>
+                      <span className="text-purple-300/80 uppercase">({photo.aspectRatio})</span>
+                    </div>
+                  )}
                   {isMonochromeCapture && (
                     <div className="hidden sm:inline-flex items-center gap-1 bg-purple-950/85 backdrop-blur-md px-2.5 py-1.5 rounded-full border border-purple-500/40 text-[10px] font-mono text-purple-200 leading-none">
                       <span>✦ B&W RAW Capture</span>

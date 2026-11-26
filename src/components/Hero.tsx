@@ -411,7 +411,7 @@ export const Hero: React.FC<HeroProps> = ({
               </picture>
 
               {/* Interactive Character / Studio Elements Overlay (Cleanly positioned beside Siva) */}
-              <div className="absolute bottom-0 -left-2 sm:-left-6 md:-left-8 lg:-left-24 xl:-left-36 2xl:-left-44 z-30 pointer-events-auto">
+              <div className="absolute bottom-0 -left-6 sm:-left-10 md:-left-14 lg:-left-28 xl:-left-40 2xl:-left-48 z-30 pointer-events-auto scale-90 sm:scale-95 lg:scale-100 origin-bottom-left">
                 <AnimatePresence mode="wait">
                   {!isDesign ? (
                     <motion.div
