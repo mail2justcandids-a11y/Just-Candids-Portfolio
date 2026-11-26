@@ -11,7 +11,6 @@ import { AboutSection } from './components/AboutSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { AmbientCanvas } from './components/AmbientCanvas';
-import { WhatsAppFloatingButton } from './components/WhatsAppFloatingButton';
 import { soundEngine } from './utils/soundEngine';
 import { PortfolioTab } from './types';
 
@@ -137,9 +136,6 @@ export const App: React.FC = () => {
 
       {/* Footer (Mode-aware branding & channels) */}
       <Footer activeTab={activeTab} />
-
-      {/* Floating Instant WhatsApp Booking & Inquiry Button */}
-      <WhatsAppFloatingButton activeTab={activeTab} />
     </div>
   );
 };
