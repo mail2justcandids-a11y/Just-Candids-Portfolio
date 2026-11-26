@@ -4,6 +4,8 @@ import { Camera, Palette, Sparkles, ArrowRight, ArrowDown, Zap, Sliders, Layers 
 import confetti from 'canvas-confetti';
 import { soundEngine } from '../utils/soundEngine';
 import { PortfolioTab } from '../types';
+import { MiniCameraman } from './MiniCameraman';
+import { DesignElements } from './DesignElements';
 
 interface HeroProps {
   activeTab: PortfolioTab;
@@ -370,7 +372,7 @@ export const Hero: React.FC<HeroProps> = ({
           </div>
 
           {/* Right Column: Siva's Portrait with 3D Parallax & Depth (6 cols) */}
-          <div className="lg:col-span-6 relative flex items-end justify-center lg:justify-end w-full pt-4 lg:pt-0 perspective-[1000px] min-w-0 max-w-full overflow-hidden">
+          <div className="lg:col-span-6 relative flex items-end justify-center lg:justify-end w-full pt-4 lg:pt-0 perspective-[1000px] min-w-0 max-w-full overflow-visible">
             <motion.div
               style={{
                 rotateY: portraitRotateY,
@@ -378,9 +380,7 @@ export const Hero: React.FC<HeroProps> = ({
                 x: portraitTranslateX,
                 transformStyle: 'preserve-3d',
               }}
-              className="relative w-full max-w-sm sm:max-w-md lg:max-w-lg xl:max-w-xl flex items-end justify-center transition-transform duration-100 ease-out cursor-pointer"
-              onClick={triggerShutterFlash}
-              title={isDesign ? "Click on Siva for creative glow" : "Click on Siva to trigger studio flash"}
+              className="relative w-full max-w-sm sm:max-w-md lg:max-w-lg xl:max-w-xl flex items-end justify-center transition-transform duration-100 ease-out"
             >
               {/* Dynamic Soft Key-Light Glow behind Siva's Head/Shoulders */}
               <motion.div
@@ -393,7 +393,11 @@ export const Hero: React.FC<HeroProps> = ({
               />
 
               {/* Siva's Portrait Cutout - Solid Sharp Torso with Clean Micro-Blend at Base */}
-              <picture className="relative z-10 w-full flex items-end justify-center">
+              <picture
+                className="relative z-10 w-full flex items-end justify-center cursor-pointer"
+                onClick={triggerShutterFlash}
+                title={isDesign ? "Click for creative vector glow" : "Click to trigger studio flash"}
+              >
                 <source srcSet="/images/siva-cutout@2x.png 2x, /images/siva-cutout.png 1x" type="image/png" />
                 <img
                   src="/images/siva-cutout.png"
@@ -405,6 +409,33 @@ export const Hero: React.FC<HeroProps> = ({
                   className="w-full max-h-[480px] sm:max-h-[580px] lg:max-h-[660px] object-contain object-bottom pointer-events-none"
                 />
               </picture>
+
+              {/* Interactive Character / Studio Elements Overlay */}
+              <div className="absolute bottom-2 -left-2 sm:-left-6 md:-left-8 lg:-left-12 z-30 pointer-events-auto">
+                <AnimatePresence mode="wait">
+                  {!isDesign ? (
+                    <motion.div
+                      key="cameraman"
+                      initial={{ opacity: 0, scale: 0.85, x: -15 }}
+                      animate={{ opacity: 1, scale: 1, x: 0 }}
+                      exit={{ opacity: 0, scale: 0.85, x: -15 }}
+                      transition={{ duration: 0.35 }}
+                    >
+                      <MiniCameraman isTriggered={isFlashing} onSnap={triggerShutterFlash} />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="design-elements"
+                      initial={{ opacity: 0, scale: 0.85, x: -15 }}
+                      animate={{ opacity: 1, scale: 1, x: 0 }}
+                      exit={{ opacity: 0, scale: 0.85, x: -15 }}
+                      transition={{ duration: 0.35 }}
+                    >
+                      <DesignElements isTriggered={isFlashing} onGlow={triggerShutterFlash} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </motion.div>
           </div>
 
