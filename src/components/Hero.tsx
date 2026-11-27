@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
 import { Camera, Palette, Sparkles, ArrowRight, ArrowDown, Zap, Sliders, Layers } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -105,6 +105,23 @@ export const Hero: React.FC<HeroProps> = ({
     rawMouseY.set(20);
   };
 
+  // Canvas reference for 100% reliable main-thread poppers (no Web Worker / CSP restrictions)
+  const confettiCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const confettiInstanceRef = useRef<confetti.CreateTypes | null>(null);
+
+  useEffect(() => {
+    if (confettiCanvasRef.current && !confettiInstanceRef.current) {
+      try {
+        confettiInstanceRef.current = confetti.create(confettiCanvasRef.current, {
+          resize: true,
+          useWorker: false,
+        });
+      } catch (err) {
+        console.warn('Custom canvas confetti init error:', err);
+      }
+    }
+  }, []);
+
   // Interactive Shutter Flash Trigger with Dual Celebratory Poppers & Mechanical Audio
   const triggerShutterFlash = () => {
     soundEngine.playMechanicalShutter();
@@ -115,45 +132,82 @@ export const Hero: React.FC<HeroProps> = ({
         : '📸 4K RAW Candid Captured • 1/250s ƒ/1.4 ISO 100'
     );
 
-    try {
-      const colors = isDesign
-        ? ['#c084fc', '#a855f7', '#e879f9', '#ffd700', '#ffffff', '#38bdf8']
-        : ['#ffd700', '#f59e0b', '#d4af37', '#fef08a', '#fbbf24', '#ffffff', '#ffedd5'];
-
-      // Left celebratory cannon
-      confetti({
-        particleCount: 80,
-        angle: 60,
-        spread: 70,
-        origin: { x: 0.15, y: 0.7 },
-        colors,
-        zIndex: 99999,
-        disableForReducedMotion: false,
-      });
-
-      // Right celebratory cannon
-      confetti({
-        particleCount: 80,
-        angle: 120,
-        spread: 70,
-        origin: { x: 0.85, y: 0.7 },
-        colors,
-        zIndex: 99999,
-        disableForReducedMotion: false,
-      });
-
-      // Center high-burst golden fireworks
-      confetti({
-        particleCount: 90,
-        spread: 100,
-        origin: { x: 0.5, y: 0.45 },
-        colors,
-        zIndex: 99999,
-        disableForReducedMotion: false,
-      });
-    } catch (err) {
-      console.warn('Confetti burst error:', err);
+    // Ensure instance is initialized on dedicated canvas (bypasses Web Worker / CSP restrictions)
+    if (!confettiInstanceRef.current && confettiCanvasRef.current) {
+      try {
+        confettiInstanceRef.current = confetti.create(confettiCanvasRef.current, {
+          resize: true,
+          useWorker: false,
+        });
+      } catch (err) {
+        console.warn('Canvas confetti creation error:', err);
+      }
     }
+
+    // Guaranteed Celebration Poppers Burst
+    const colors = isDesign
+      ? ['#c084fc', '#a855f7', '#e879f9', '#ffd700', '#ffffff', '#38bdf8']
+      : ['#ffd700', '#f59e0b', '#d4af37', '#fef08a', '#fbbf24', '#ffffff'];
+
+    const fireInstance = (fn: any) => {
+      try {
+        // Center high celebration blast
+        fn({
+          particleCount: 100,
+          spread: 95,
+          origin: { x: 0.5, y: 0.45 },
+          colors,
+          zIndex: 99999999,
+          disableForReducedMotion: false,
+        });
+
+        // Left celebratory cannon
+        fn({
+          particleCount: 80,
+          angle: 60,
+          spread: 70,
+          origin: { x: 0.1, y: 0.75 },
+          colors,
+          zIndex: 99999999,
+          disableForReducedMotion: false,
+        });
+
+        // Right celebratory cannon
+        fn({
+          particleCount: 80,
+          angle: 120,
+          spread: 70,
+          origin: { x: 0.9, y: 0.75 },
+          colors,
+          zIndex: 99999999,
+          disableForReducedMotion: false,
+        });
+
+        // Follow-up cascade burst
+        setTimeout(() => {
+          try {
+            fn({
+              particleCount: 65,
+              spread: 120,
+              origin: { x: 0.5, y: 0.35 },
+              colors,
+              zIndex: 99999999,
+              disableForReducedMotion: false,
+            });
+          } catch (e) {}
+        }, 160);
+      } catch (e) {
+        console.warn('Confetti burst error:', e);
+      }
+    };
+
+    if (confettiInstanceRef.current) {
+      fireInstance(confettiInstanceRef.current);
+    }
+    // Also trigger global confetti as secondary fallback
+    try {
+      fireInstance(confetti);
+    } catch (e) {}
 
     setTimeout(() => setIsFlashing(false), 380);
     setTimeout(() => setFlashMessage(null), 3200);
@@ -162,8 +216,26 @@ export const Hero: React.FC<HeroProps> = ({
   const currentTheme = MOODS[activeMood];
 
   return (
-    <section
-      id="hero"
+    <>
+      {/* 100% Reliable Dedicated Top-Level Full-Screen Celebration Poppers Canvas */}
+      <canvas
+        ref={confettiCanvasRef}
+        id="celebration-popper-canvas"
+        className="fixed inset-0 pointer-events-none w-screen h-screen"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          pointerEvents: 'none',
+          zIndex: 99999999,
+        }}
+        aria-hidden="true"
+      />
+
+      <section
+        id="hero"
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
@@ -265,7 +337,7 @@ export const Hero: React.FC<HeroProps> = ({
             </div>
 
             {/* Mode-Sensitive Direct Action Buttons */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2 w-full max-w-2xl">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 pt-2 w-full max-w-md sm:max-w-none">
               {isDesign ? (
                 <>
                   {/* Design Mode Buttons */}
@@ -279,20 +351,6 @@ export const Hero: React.FC<HeroProps> = ({
                     <Sparkles className="w-4 h-4 text-purple-100 shrink-0 animate-pulse" />
                     <span>Commission Design</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0 text-purple-200" />
-                  </button>
-
-                  {/* Clean Prominent Snap Flash Button */}
-                  <button
-                    onClick={triggerShutterFlash}
-                    className="group relative inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 rounded-full font-nav font-bold text-xs sm:text-sm tracking-wide bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-black border border-amber-200 shadow-xl shadow-amber-500/30 hover:shadow-amber-400/50 hover:scale-[1.04] active:scale-[0.98] transition-all cursor-pointer select-none"
-                    title="Click to trigger camera shutter flash"
-                  >
-                    <span className="relative flex h-2 w-2 shrink-0">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-black" />
-                    </span>
-                    <Zap className="w-4 h-4 text-black group-hover:scale-110 transition-transform filter drop-shadow-[0_0_4px_rgba(0,0,0,0.5)]" />
-                    <span>Snap Flash</span>
                   </button>
 
                   <button
@@ -335,20 +393,6 @@ export const Hero: React.FC<HeroProps> = ({
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0 text-purple-200" />
                   </button>
 
-                  {/* Clean Prominent Snap Flash Button */}
-                  <button
-                    onClick={triggerShutterFlash}
-                    className="group relative inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 rounded-full font-nav font-bold text-xs sm:text-sm tracking-wide bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-black border border-amber-200 shadow-xl shadow-amber-500/30 hover:shadow-amber-400/50 hover:scale-[1.04] active:scale-[0.98] transition-all cursor-pointer select-none"
-                    title="Click to fire studio shutter flash"
-                  >
-                    <span className="relative flex h-2 w-2 shrink-0">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-black" />
-                    </span>
-                    <Zap className="w-4 h-4 text-black group-hover:scale-110 transition-transform filter drop-shadow-[0_0_4px_rgba(0,0,0,0.5)]" />
-                    <span>Snap Flash</span>
-                  </button>
-
                   <button
                     onClick={() => {
                       soundEngine.playQuickSnap();
@@ -377,7 +421,7 @@ export const Hero: React.FC<HeroProps> = ({
               )}
             </div>
 
-            {/* Studio Lighting Mood Selector & Shutter Trigger */}
+            {/* Studio Lighting Mood Selector & Shutter Trigger (Matches user's screenshot) */}
             <div className="pt-3 flex flex-wrap items-center justify-center lg:justify-start gap-2.5 sm:gap-3 w-full max-w-full">
               <div className="flex flex-col sm:flex-row items-center gap-2 max-w-full">
                 <span className="text-[10px] sm:text-[11px] font-project-label text-purple-300/90 font-medium shrink-0">
@@ -410,6 +454,20 @@ export const Hero: React.FC<HeroProps> = ({
                   })}
                 </div>
               </div>
+
+              {/* Snap Flash Trigger Button (Exactly where shown in user's screenshot) */}
+              <button
+                onClick={triggerShutterFlash}
+                className="group relative inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-nav font-bold tracking-wide transition-all active:scale-95 shadow-xl shrink-0 select-none cursor-pointer border bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-black border-amber-200 shadow-amber-500/40 hover:shadow-amber-400/60"
+                title="Click to trigger camera shutter flash & celebration"
+              >
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-black" />
+                </span>
+                <Zap className="w-3.5 h-3.5 text-black group-hover:scale-110 transition-transform filter drop-shadow-[0_0_4px_rgba(0,0,0,0.5)]" />
+                <span>Snap 4K Flash</span>
+              </button>
             </div>
 
           </div>
@@ -456,13 +514,13 @@ export const Hero: React.FC<HeroProps> = ({
               {/* Interactive Viewfinder Shutter HUD Badge on Portrait */}
               <button
                 onClick={triggerShutterFlash}
-                className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-20 group inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-black/90 hover:bg-black text-white shadow-2xl backdrop-blur-md text-[11px] sm:text-xs font-mono tracking-wider transition-all hover:scale-105 active:scale-95 cursor-pointer border border-amber-400/70 hover:border-amber-300 shadow-amber-500/30"
-                title="Click to fire studio shutter flash"
+                className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-20 group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/90 hover:bg-black text-amber-300 shadow-2xl backdrop-blur-md text-[10px] sm:text-[11px] font-mono tracking-wider transition-all hover:scale-105 active:scale-95 cursor-pointer border border-amber-400/50 hover:border-amber-300"
+                title="Click to trigger shutter flash & celebration"
               >
-                <span className="w-2.5 h-2.5 rounded-full animate-ping bg-amber-400 opacity-75" />
-                <span className="font-bold text-amber-200 group-hover:text-amber-100 flex items-center gap-1.5">
-                  <Camera className="w-3.5 h-3.5 text-amber-300" />
-                  <span>SNAP FLASH 📸</span>
+                <span className="w-2 h-2 rounded-full animate-ping bg-amber-400 opacity-75" />
+                <span className="font-bold flex items-center gap-1 text-amber-300">
+                  <Camera className="w-3 h-3 text-amber-400" />
+                  <span>CLICK TO SNAP</span>
                 </span>
               </button>
             </motion.div>
@@ -471,5 +529,6 @@ export const Hero: React.FC<HeroProps> = ({
         </div>
       </div>
     </section>
-  );
+  </>
+);
 };
